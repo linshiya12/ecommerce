@@ -1,0 +1,124 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+
+{% comment %} <main class="main" style="background-color: #f8f9fa; padding: 30px 0; min-height: 100vh;"> {% endcomment %}
+<div class="login-page bg-image pt-8 pb-8 pt-md-12 pb-md-12 pt-lg-17 pb-lg-17" style="background-image: url({% static 'assets/images/backgrounds/login-bg.jpg' %}); height: 100%;">
+    <div class="container my-5">
+        <div class="row justify-content-center">
+            <!-- Sidebar Navigation -->
+            <aside class="col-md-4 col-lg-3 mb-4">
+                <div class="card" 
+                     style="border: 1px solid #dee2e6; border-radius: 8px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); text-align: center;">
+                    <div class="card-header" 
+                         style="background-color: #C33C3C ; color: #fff; font-weight: bold; padding: 1rem; border-bottom: 1px solid #dee2e6;">
+                        My Account
+                    </div>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item">
+                            <a class="nav-link {% if request.resolver_match.url_name == 'account' %}active{% endif %}" 
+                               href="{% url 'account' %}" 
+                               style="color: #333; text-decoration: none; font-size: 16px;">
+                                <i class="icon-user text-primary" style="margin-right: 10px; font-size: 18px;"></i> Account Details
+                            </a>
+                        </li>
+                        <li class="list-group-item">
+                            <a class="nav-link {% if request.resolver_match.url_name == 'order' %}active{% endif %}" 
+                               href="{% url 'order' %}" 
+                               style="color: #333; text-decoration: none; font-size: 16px;">
+                                <i class="icon-bag text-primary" style="margin-right: 10px; font-size: 18px;"></i> Orders
+                            </a>
+                        </li>
+
+                        <li class="list-group-item">
+                            <a class="nav-link {% if request.resolver_match.url_name == 'mywallet' %}active{% endif %}" 
+                               href="{% url 'mywallet' %}" 
+                               style="color: #333; text-decoration: none; font-size: 16px;">
+                                <i class="icon-map text-primary" style="margin-right: 10px; font-size: 18px;"></i> My Wallet
+                            </a>
+                        </li>
+                        <li class="list-group-item">
+                            <a class="nav-link {% if request.resolver_match.url_name == 'address' %}active{% endif %}" 
+                               href="{% url 'address' %}" 
+                               style="color: #333; text-decoration: none; font-size: 16px;">
+                                <i class="icon-map text-primary" style="margin-right: 10px; font-size: 18px;"></i> Addresses
+                            </a>
+                        </li>
+                        <li class="list-group-item">
+                            <a class="nav-link {% if request.resolver_match.url_name == 'resetpass' %}active{% endif %}" 
+                               href="{% url 'resetpass' %}" 
+                               style="color: #333; text-decoration: none; font-size: 16px;">
+                                <i class="icon-lock text-primary" style="margin-right: 10px; font-size: 18px;"></i> Reset Password
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </aside>
+    
+            <!-- Main Content -->
+            <div class="col-md-8 col-lg-9">
+                <div class="card" 
+                     style="border: 1px solid #dee2e6; border-radius: 8px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); padding: 2rem;">
+                    <h3 class="card-title text-center" style="color: #007bff; font-weight: bold; margin-bottom: 20px;">Your Account</h3>
+    
+                    <!-- Boxed Form -->
+                    <form>
+                        <div class="mb-3">
+                            <label for="fullName" style="font-weight: bold; color: #333;">Full Name</label>
+                            <input type="text" id="fullName" class="form-control" value="{{ user.username }} {{ user.last_name }}" readonly 
+                                   style="background-color: #f1f1f1; border: 1px solid #dee2e6; border-radius: 5px;">
+                        </div>
+    
+                        <div class="mb-3">
+                            <label for="email" style="font-weight: bold; color: #333;">Email</label>
+                            <input type="email" id="email" class="form-control" value="{{ user.email }}" readonly 
+                                   style="background-color: #f1f1f1; border: 1px solid #dee2e6; border-radius: 5px;">
+                        </div>
+    
+                        <div class="mb-3">
+                            <label for="phone" style="font-weight: bold; color: #333;">Phone Number</label>
+                            <input type="text" id="phone" class="form-control" value="{{ user.phoneno }}" readonly 
+                                   style="background-color: #f1f1f1; border: 1px solid #dee2e6; border-radius: 5px;">
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="Referral Code" style="font-weight: bold; color: #333;">Referral code</label>
+                            <input type="text" id="fullName" class="form-control" value="{{ user.referral_code }}" readonly 
+                                   style="background-color: #f1f1f1; border: 1px solid #dee2e6; border-radius: 5px;">
+                        </div>
+    
+                        <div class="text-center">
+                            <a href="{% url "editprofile" user.id %}" class="btn btn-primary mt-3" 
+                               style="padding: 10px 30px; font-size: 16px; border-radius: 4px; text-decoration: none; background-color: #007bff; color: #fff;">
+                                Edit Profile
+                            </a>
+                        </div>
+                    </form>
+
+                    <div class="mb-3">
+                        <label for="shareReferral" style="font-weight: bold; color: #333;">Share Your Referral Code : {{ user.referral_code }}</label>
+                        <div>
+                            <!-- WhatsApp Share -->
+                            <a href="https://wa.me/?text=Check%20out%20this%20awesome%20platform%20and%20use%20my%20referral%20code%20{{ user.referral_code }}%20to%20join!" 
+                               target="_blank" class="btn btn-success">
+                                Share on WhatsApp
+                            </a>
+                    
+                            <!-- Email Share -->
+                            <a href="mailto:?subject=Check%20out%20this%20awesome%20platform%20and%20use%20my%20referral%20code&body=Use%20my%20referral%20code%20{{ user.referral_code }}%20to%20join!" 
+                               class="btn btn-primary" style="margin-left: 10px;">
+                                Share via Email
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    
+
+</div>
+{% comment %} </main> {% endcomment %}
+
+{% endblock %}

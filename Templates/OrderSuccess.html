@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Successful</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f8f9fa;
+        }
+        .container {
+            text-align: center;
+            background: #fff;
+            padding: 60px 80px; /* Increased padding */
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            width: 500px; /* Increased width */
+        }
+        .success-icon {
+            display: inline-block;
+            width: 100px; /* Increased size */
+            height: 100px; /* Increased size */
+            border-radius: 50%;
+            background-color: #28a745;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0 auto 30px auto; /* Added margin for better spacing */
+        }
+        .success-icon i {
+            font-size: 50px; /* Increased icon size */
+            color: #fff;
+        }
+        h1 {
+            color: #28a745;
+            font-size: 28px; /* Increased font size */
+            margin-bottom: 15px;
+        }
+        p {
+            margin-bottom: 40px;
+            color: #6c757d;
+            font-size: 18px; /* Increased font size */
+        }
+        .btn {
+            display: inline-block;
+            margin: 15px 10px 0 0; /* Adjusted margin */
+            padding: 12px 25px; /* Increased padding for buttons */
+            font-size: 18px; /* Increased button font size */
+            color: #fff;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background 0.3s ease;
+        }
+        .btn-home {
+            background-color: #007bff;
+        }
+        .btn-home:hover {
+            background-color: #0056b3;
+        }
+        .btn-order {
+            background-color: #28a745;
+        }
+        .btn-order:hover {
+            background-color: #218838;
+        }
+    </style>
+    <!-- Add FontAwesome for the tick icon -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <div class="success-icon">
+            <i class="fas fa-check"></i>
+        </div>
+        <h1>Order Successful!</h1>
+        <p>Your order has been placed successfully. Thank you for shopping with us!</p>
+        <div>
+            <a href="{% url "home" %}" class="btn btn-home">Go Home</a>
+            <a href="{% url "order" %}" class="btn btn-order">View Orders</a>
+        </div>
+    </div>
+
+    <script>
+        window.onpageshow = function(event) {
+            if (event.persisted) {
+                // Redirect to the homepage or another page
+                window.location.href = "/";
+            }
+        };
+    </script>
+</body>
+</html>

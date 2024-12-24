@@ -1,0 +1,144 @@
+{% extends "adminbase.html" %}
+{% load static %}
+
+{% block css %}
+
+<style>
+    body {
+        background-color: #f8f9fa;
+    }
+    .container {
+        background: white;
+        border-radius: 8px;
+        padding: 30px; /* Increased padding */
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+    .form-group {
+        margin-bottom: 30px; /* Increased space between fields */
+    }
+    .form-group label {
+        font-weight: bold;
+    }
+    .current-image {
+        margin-top: 10px;
+    }
+    button {
+        margin-top: 20px; /* Added space before the submit button */
+    }
+</style>
+
+{% endblock css %}
+{% block content %}
+
+
+<div class="container-xxl flex-grow-1 container-p-y mt-5" style="background-color:#E6E6FA">
+    
+    <!-- Product List Widget -->
+    <div class="card mb-6">
+        <div class="card-widget-separator-wrapper">
+            <div class="card-body card-widget-separator" style="border: 5px solid #A67BCA;">
+
+                {% if message %}
+                <div class="alert alert-{{ message_type }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                {% endif %}
+                
+                <div class="container mt-5">
+        
+                    <form action="" method="POST" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <!-- CSRF Token (if needed in your backend) -->
+                        <input type="hidden" name="_csrf" value="your_csrf_token_here">
+                
+                        
+                        <div class="form-group">
+                            <label for="variant">Variant<span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="variant" name="variant" value="{{variant.colour}}" required>
+                            
+                        </div>
+
+                        <div class="form-group">
+                            <label for="size">Variant Status</label>
+                            <select class="form-control" id="size" name="size">
+                                <option value="xs">xs</option>
+                                <option value="sm" selected>sm</option>
+                                <option value="md">md</option>
+                                <option value="lg">lg</option>
+                                <option value="xl">xl</option>
+                                <option value="xxl">xxl</option>
+
+                            </select>
+                        </div>
+                
+                       
+                        <div class="form-group">
+                            <label for="size_status">Size Status</label>
+                            <select class="form-control" id="size_status" name="size_status">
+                                <option value="draft">Draft</option>
+                                <option value="published" selected>Published</option>
+                                <option value="in_review">In Review</option>
+                                <option value="disabled">Disabled</option>
+                                <option value="rejected">Rejected</option>
+
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="stock">Stock</label>
+                            <select class="form-control" id="stock" name="stock">
+                                <option value="Stock_Out">stock_out</option>
+                                <option value="Stock_In" selected>stock_in</option>
+                                
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="quantity">Quantity<span class="text-danger">*</span></label>
+                            <input type="number" class="form-control" id="quantity" name="quantity" value="" min="0" max="100" required>
+                        </div>
+                        
+
+                        <button type="submit" class="btn btn-primary">Add size</button>
+                    </form>
+                   
+                </div>
+                
+                
+            </div>
+        </div>
+    </div>
+
+    
+</div>
+
+
+{% endblock content %}
+
+{% block js %}
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+<script>
+    // Bootstrap 4 custom validation
+    (function() {
+        'use strict';
+        window.addEventListener('load', function() {
+            var form = document.getElementById('editProductForm');
+            form.addEventListener('submit', function(event) {
+                if (form.checkValidity() === false) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                form.classList.add('was-validated');
+            }, false);
+        }, false);
+    })();
+</script>
+
+{% endblock %}

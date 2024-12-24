@@ -1,0 +1,59 @@
+{% extends "adminbase.html" %}
+{% load static %}
+
+
+{% block content %}
+
+<div class="container-xxl flex-grow-1 container-p-y mt-5" style="background-color:#E6E6FA">
+        
+    
+    <!-- Product List Table -->
+    <div class="card-body card-widget-separator" style="border: 5px solid #A67BCA;">
+    <div class="card">
+        
+        <div class="card-body">
+            
+            <div class="card-datatable table-responsive">
+                <h1 class="text-center mb-4">User Details</h1>
+                <table class="table table-bordered">
+                    <thead class="thead-light">
+                        <tr>
+                            <th>NO</th>
+                            <th>User</th>
+                            <th>email</th>
+                            <th>Phone Number</th>
+                           
+                            
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for user in users %}
+                             
+                        <tr>
+                            <td>{{ forloop.counter }}</td>
+                            <td>{{user.username}}</td>
+                            <td >{{ user.email}}</td>
+                            <td >{{ user.phoneno }}</td>
+                        </tr>
+                        {% endfor %}
+                        
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+
+
+
+                      
+            
+
+{% endblock content%}
+{% block js %}
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+{% endblock js %}

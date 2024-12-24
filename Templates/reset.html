@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+
+<div class="login-page bg-image pt-8 pb-8 pt-md-12 pb-md-12 pt-lg-17 pb-lg-17" style="background-image: url({% static 'assets/images/backgrounds/login-bg.jpg' %}); height: 100vh;">
+    <div class="container my-5">
+        <div class="row justify-content-center">
+            <!-- Sidebar Navigation -->
+            <aside class="col-md-4 col-lg-3 mb-4">
+                <div class="card" 
+                     style="border: 1px solid #dee2e6; border-radius: 8px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); text-align: center;">
+                    <div class="card-header" 
+                         style="background-color: #C33C3C; color: #fff; font-weight: bold; padding: 1rem; border-bottom: 1px solid #dee2e6;">
+                        My Account
+                    </div>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item">
+                            <a class="nav-link {% if request.resolver_match.url_name == 'account' %}active{% endif %}" 
+                               href="{% url 'account' %}" 
+                               style="color: #333; text-decoration: none; font-size: 16px;">
+                                <i class="icon-user text-primary" style="margin-right: 10px; font-size: 18px;"></i> Account Details
+                            </a>
+                        </li>
+                        <li class="list-group-item">
+                            <a class="nav-link {% if request.resolver_match.url_name == 'order' %}active{% endif %}" 
+                               href="{% url 'order' %}" 
+                               style="color: #333; text-decoration: none; font-size: 16px;">
+                                <i class="icon-bag text-primary" style="margin-right: 10px; font-size: 18px;"></i> Orders
+                            </a>
+                        </li>
+                        <li class="list-group-item">
+                            <a class="nav-link {% if request.resolver_match.url_name == 'address' %}active{% endif %}" 
+                               href="{% url 'address' %}" 
+                               style="color: #333; text-decoration: none; font-size: 16px;">
+                                <i class="icon-map text-primary" style="margin-right: 10px; font-size: 18px;"></i> Addresses
+                            </a>
+                        </li>
+                        <li class="list-group-item">
+                            <a class="nav-link {% if request.resolver_match.url_name == 'mywallet' %}active{% endif %}" 
+                               href="{% url 'mywallet' %}" 
+                               style="color: #333; text-decoration: none; font-size: 16px;">
+                                <i class="icon-map text-primary" style="margin-right: 10px; font-size: 18px;"></i> My Wallet
+                            </a>
+                        </li>
+                        <li class="list-group-item">
+                            <a class="nav-link {% if request.resolver_match.url_name == 'resetpass' %}active{% endif %}" 
+                               href="{% url 'resetpass' %}" 
+                               style="color: #333; text-decoration: none; font-size: 16px;">
+                                <i class="icon-lock text-primary" style="margin-right: 10px; font-size: 18px;"></i> Reset Password
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </aside>
+    
+            <!-- Main Content -->
+            <div class="col-md-8 col-lg-9">
+                <div class="card" style="border: 1px solid #dee2e6; border-radius: 8px; background-color: #ffffff; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); padding: 30px;">
+                    <h3 class="card-title text-center" style="color: #007bff; font-weight: bold; margin-bottom: 20px;">Reset Your Password</h3>
+                    
+                    {% if message %}
+                        <div class="alert alert-{{ message_type }} alert-dismissible fade show m-4" role="alert">
+                            {{ message }}
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                {% endif %}
+                
+                    <!-- Reset Password Form -->
+                    <form method="POST" action="{% url 'resetpass' %}">
+                        {% csrf_token %}
+                        <div class="form-group mb-3">
+                            <label for="old-password" style="color: #333; font-weight: bold;">Current Password</label>
+                            <input type="password" id="current-password" name="old_password" class="form-control" placeholder="Enter your current password" required>
+                        </div>
+                        <div class="form-group mb-3">
+                            <label for="new_password" style="color: #333; font-weight: bold;">New Password</label>
+                            <input type="password" id="new-password" name="new_password" class="form-control" placeholder="Enter a new password" required>
+                        </div>
+                        <div class="form-group mb-3">
+                            <label for="confirm-password" style="color: #333; font-weight: bold;">Confirm New Password</label>
+                            <input type="password" id="confirm-password" name="conf_new_password" class="form-control" placeholder="Confirm your new password" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary" style="padding: 10px 20px; font-size: 16px; border-radius: 4px;">
+                            Reset Password
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    
+
+</div>
+{% endblock %}

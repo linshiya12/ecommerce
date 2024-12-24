@@ -1,0 +1,170 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+
+<div class="login-page bg-image pt-8 pb-8 pt-md-12 pb-md-12 pt-lg-17 pb-lg-17" style="background-image: url({% static 'assets/images/backgrounds/login-bg.jpg' %}); height: 100%;">
+
+    <div class="page-content">
+        <div class="checkout">
+            <div class="container">
+                <div class="summary">
+                    <form id="checkoutForm" method="POST" action="{% url 'addaddress' %}">
+                        {% csrf_token %}
+                        {% if message %}
+                        <div class="alert alert-{{ message_type }} alert-dismissible fade show m-4" role="alert">
+                            {{ message }}
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        {% endif %}
+                        <div class="row">
+                            <div class="col-lg-9">
+                                <h2 class="checkout-title">Billing Details</h2>
+                                <div class="row">
+                                    <div class="col-sm-6">
+                                        <label for="first_name">First Name *</label>
+                                        <input type="text" class="form-control" name="first_name" id="first_name" required>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <label for="last_name">Last Name *</label>
+                                        <input type="text" class="form-control" name="last_name" id="last_name" required>
+                                    </div>
+                                </div>
+                    
+                                <label for="country">Country *</label>
+                                <input type="text" class="form-control" name="country" id="country" required>
+                    
+                                <label for="street">Street Address *</label>
+                                <input type="text" class="form-control" name="street" id="street" placeholder="House number and Street name" required>
+                    
+                                <div class="row">
+                                    <div class="col-sm-6">
+                                        <label for="city">Town / City *</label>
+                                        <input type="text" class="form-control" name="city" id="city" required>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <label for="state">State / County *</label>
+                                        <input type="text" class="form-control" name="state" id="state" required>
+                                    </div>
+                                </div>
+                    
+                                <div class="row">
+                                    <div class="col-sm-6">
+                                        <label for="postal_code">Postcode / ZIP *</label>
+                                        <input type="text" class="form-control" name="postal_code" id="postal_code" required>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <label for="phone">Phone *</label>
+                                        <input type="tel" class="form-control" name="phone" id="phone" required>
+                                    </div>
+                                </div>
+                    
+                                <label for="email">Email Address *</label>
+                                <input type="email" class="form-control" name="email" id="email" required>
+                    
+                                <button type="submit" class="btn btn-primary mt-3">Add</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div><!-- End .container -->
+        </div><!-- End .checkout -->
+    </div><!-- End .page-content -->
+</div>
+
+{% endblock  %}
+
+{% block js %}
+
+<script>
+    document.getElementById('checkoutForm').addEventListener('submit', function(event) {
+        let valid = true;
+
+        // Function to check if the input value contains only spaces
+        function isNotEmpty(value) {
+            return value.trim() !== ''; // Check if value is not just spaces
+        }
+
+        // SweetAlert function to show validation messages
+        function showAlert(title, message) {
+            Swal.fire({
+                icon: 'error',
+                title: title,
+                text: message,
+            });
+        }
+
+        // First Name Validation
+        const firstName = document.getElementById('first_name').value;
+        if (!isNotEmpty(firstName)) {
+            valid = false;
+            showAlert('Validation Error', 'First Name is required and cannot be empty or only spaces.');
+        }
+
+        // Last Name Validation
+        const lastName = document.getElementById('last_name').value;
+        if (!isNotEmpty(lastName)) {
+            valid = false;
+            showAlert('Validation Error', 'Last Name is required and cannot be empty or only spaces.');
+        }
+
+        // Country Validation
+        const country = document.getElementById('country').value;
+        if (!isNotEmpty(country)) {
+            valid = false;
+            showAlert('Validation Error', 'Country is required and cannot be empty or only spaces.');
+        }
+
+        // Street Address Validation
+        const street = document.getElementById('street').value;
+        if (!isNotEmpty(street)) {
+            valid = false;
+            showAlert('Validation Error', 'Street Address is required and cannot be empty or only spaces.');
+        }
+
+        // City Validation
+        const city = document.getElementById('city').value;
+        if (!isNotEmpty(city)) {
+            valid = false;
+            showAlert('Validation Error', 'City is required and cannot be empty or only spaces.');
+        }
+
+        // State Validation
+        const state = document.getElementById('state').value;
+        if (!isNotEmpty(state)) {
+            valid = false;
+            showAlert('Validation Error', 'State is required and cannot be empty or only spaces.');
+        }
+
+        // Postal Code Validation (between 6 and 10 characters)
+        const postalCode = document.getElementById('postal_code').value;
+        if (!isNotEmpty(postalCode) || postalCode.length < 6 || postalCode.length > 10) {
+            valid = false;
+            showAlert('Validation Error', 'Postal Code must be between 6 and 10 characters.');
+        }
+
+        // Phone Validation (at least 10 digits)
+        const phone = document.getElementById('phone').value;
+        if (!isNotEmpty(phone) || phone.length < 10 || isNaN(phone)) {
+            valid = false;
+            showAlert('Validation Error', 'Phone number must be at least 10 digits.');
+        }
+
+        // Email Validation
+        const email = document.getElementById('email').value;
+        const emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
+        if (!isNotEmpty(email) || !email.match(emailPattern)) {
+            valid = false;
+            showAlert('Validation Error', 'Please enter a valid email address and ensure it is not empty or only spaces.');
+        }
+
+        // If any validation fails, prevent form submission
+        if (!valid) {
+            event.preventDefault();
+        }
+    });
+</script>
+
+
+{% endblock js %}

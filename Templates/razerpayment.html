@@ -1,0 +1,53 @@
+<form id="razorpay-form">
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <script>
+        var options = {
+            "key": "{{ razorpay_merchant_key }}", // Razorpay Key ID
+            "amount": "{{ total_price|floatformat:0 }}", // Amount in paise (100 paise = 1 INR)
+            "currency": "INR",
+            "order_id": "{{ order_id }}", // Order ID from Razorpay
+            "handler": function(response) {
+
+                var form = document.getElementById("razorpay-form");
+                var csrf_token = '{{ csrf_token }}'; // CSRF token
+                var formData = new FormData();
+                formData.append("razorpay_order_id", response.razorpay_order_id);
+                formData.append("razorpay_payment_id", response.razorpay_payment_id);
+                formData.append("razorpay_signature", response.razorpay_signature);
+                formData.append("address_id", "{{ address_id }}"); // Ensure this value is passed correctly
+
+                // Send payment data to server for verification
+                fetch('/verify-payment/', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': csrf_token
+                    },
+                    body: formData
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Server responded with an error');
+                    }
+                    return response.json(); // Parse response as JSON
+                })
+                .then(data => {
+
+                    if (data.status === 'Payment Verified') {
+                        // Redirect to the order success page
+                        window.location.href = data.redirect; // Use the redirect URL from the backend
+                    } else {
+                        alert('Payment verification failed');
+                    }
+                })
+                .catch(error => {
+                    // Handle errors
+                    console.error('Fetch Error:', error); // Log fetch errors
+                    alert('Payment verification failed due to an error');
+                });
+            }
+        };
+
+        var rzp1 = new Razorpay(options);
+        rzp1.open(); // Open Razorpay modal
+    </script>
+</form>

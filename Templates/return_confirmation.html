@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Return Confirmation</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/5.3.0-alpha1/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #f8f9fa;
+        }
+        .card {
+            border-radius: 12px;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+            max-width: 800px; /* Increased size of the box */
+            padding: 50px; /* Increased padding */
+            text-align: center;
+        }
+        .success-icon {
+            width: 150px; /* Increased size of the tick icon */
+            margin: 30px auto;
+        }
+        .btn-custom {
+            border-radius: 25px;
+            padding: 12px 24px; /* Increased padding for buttons */
+            margin: 10px;
+            width: 220px; /* Set width for buttons */
+            font-size: 16px; /* Set font size for better visibility */
+        }
+        /* Override the default button styling if needed */
+        .btn-custom:hover {
+            opacity: 0.9; /* Add slight hover effect */
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <!-- Success Tick Icon -->
+        <img src="https://cdn-icons-png.flaticon.com/512/190/190411.png" alt="Success Icon" class="success-icon">
+
+        <h2 class="card-title text-success">Return Successful!</h2>
+        <p class="card-text mt-3" style="font-size: 20px;">
+            Your product has been successfully returned. <br>
+            You will receive a refund of <strong>₹{{ refund_amount }}</strong> within 7 working days.
+        </p>
+
+        <!-- Buttons Section -->
+        <div class="mt-4">
+            <form action="{% url 'order_view' orderitem_id %}" method="get">
+                <button type="submit" class="btn btn-success btn-custom">
+                    View Refund Details
+                </button>
+            </form>
+        </div>
+
+        <!-- Navigation Buttons -->
+        <div class="mt-4">
+            <form action="/" method="get">
+                <button type="submit" class="btn btn-primary btn-custom">
+                    Return to Home
+                </button>
+            </form>
+            <form action="{% url 'orderitems' order_id %}" method="get">
+                <button type="submit" class="btn btn-secondary btn-custom">
+                    View My Orders
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/5.3.0-alpha1/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

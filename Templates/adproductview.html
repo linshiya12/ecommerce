@@ -1,0 +1,121 @@
+{% extends "adminbase.html" %}
+{% load static %}
+
+{% block content %}
+
+<div class="card mb-6">
+    <div class="card-widget-separator-wrapper">
+        <div class="card-body card-widget-separator" style="border: 5px solid #A67BCA;">
+            <div class="container mt-5">
+                {% if message %}
+                <div class="alert alert-{{ message_type }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                {% endif %}
+                <h3>Product Details</h3>
+                
+                <div class="card-body">
+                    <ul class="list-group list-group-flush">
+                       
+                        <li class="list-group-item d-flex align-items-center">
+                            <strong>Title:</strong><span>{{products.title}}</span>
+                        </li>
+                            
+                      
+                        <li class="list-group-item">
+                            <strong>Description:</strong><span>{{products.description}}</span>
+                        </li>
+                        
+                        <li class="list-group-item d-flex  align-items-center">
+                            <strong>Category:</strong><span>{{products.category}}</span>
+                        
+                            
+                        </li>
+                        <li class="list-group-item d-flex  align-items-center">
+                            <strong>Brand:</strong><span>{{products.brand}}</span>
+                            
+                        </li>
+                       
+                        <li class="list-group-item d-flex align-items-center">
+                            <strong>Price:</strong><span>{{products.price}}</span>
+                            
+                        </li>
+                        <li class="list-group-item d-flex align-items-center">
+                            <strong>Discount Price:</strong><span>{{products.discounted_price}}</span>
+                           
+                        </li>
+
+                        <li class="list-group-item d-flex align-items-center">
+                            <strong>Product Status:</strong><span>{{products.product_status}}</span>
+                        </li>
+                        
+                        <li class="list-group-item">
+                            <strong>Specification:</strong><span>{{products.specification}}</span>
+                        </li>
+
+                        <li class="list-group-item d-flex align-items-center">
+                            <strong>Featured:</strong><span>{{products.featured}}</span>
+                        </li>
+
+                        <li class="list-group-item d-flex align-items-center">
+                            <strong>Date:</strong><span>{{products.date}}</span>
+                            
+                        </li>
+                        <li class="list-group-item d-flex align-items-center">
+                            <strong>Updated:</strong><span>{{products.updated}}</span>
+                            
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Edit Button -->
+                <div class="text-center mt-4">
+                    <a href="{% url "productedit" products.id %}" class="btn btn-primary">Edit Product</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    
+    <div class="card-body">
+        <div class="d-flex justify-content-between mb-3">
+            <a href="{% url "addvariant" products.id %}" class="btn btn-success">Add Variant</a>            
+        </div>
+        <div class="card-datatable table-responsive">
+            <h3>Variants</h3>
+            <table class="table table-bordered">
+                <thead class="thead-light">
+                    <tr>
+                        <th>NO</th>
+                        <th>Colour</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                        
+                    </tr>
+                </thead>
+                <tbody>
+                    
+                    {% for colour in variant_colour %}
+                    <tr>
+                        <td>{{forloop.counter}}</td>
+                        <td>{{colour.colour}}</td>
+                        <td>{{colour.variant_status}}</td>
+                    
+                        <td><a href="{% url "variantview" colour.id %}" class="btn btn-primary">View</a></td>
+                       
+                    </tr>
+                    {% endfor %}
+                    
+                </tbody>
+            </table>
+           
+        </div>
+    </div>
+</div>
+{% endblock %}
+

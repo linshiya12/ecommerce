@@ -1,0 +1,151 @@
+{% load static %}
+
+<div class="container" id="cartList">
+    <div class="row" >
+        <div class="col-lg-9">
+            <div  >
+            <table class="table table-cart table-mobile">
+                <thead>
+                    <tr>
+                        <th style="padding: 15px 20px; text-align: left;">Product</th>
+                        <th style="padding: 15px 20px; text-align: center;">Price</th>
+                        <th style="padding: 15px 20px; text-align: center;">Color</th>
+                        <th style="padding: 15px 20px; text-align: center;">Size</th>
+                        <th style="padding: 15px 20px; text-align: center;">Quantity</th>
+                        <th style="padding: 15px 20px; text-align: center;">Total</th>
+                        <th style="padding: 15px 20px; text-align: center;"></th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for item in cart_items %}
+                    <tr>
+                        <td class="product-col" style="padding: 15px 20px; text-align: left;">
+                            <div class="product">
+                                <figure class="product-media">
+                                    <a href="{% url 'product_detail' item.product.id %}">
+                                        <img src="{{ item.image.image.url }}" alt="Product image" >
+                                    </a>
+                                </figure>
+                
+                                <h3 class="product-title">
+                                    <a href="{% url 'product_detail' item.product.id %}" style="font-size: 14px; color: #333;">{{ item.product.title }}</a>
+                                </h3><!-- End .product-title -->
+                            </div><!-- End .product -->
+                        </td>
+                        <td class="price-col" style="padding: 15px 20px; text-align: center;">{{ item.price }}</td>
+                        <td class="colour-col" style="padding: 15px 20px; text-align: center;">{{ item.color_variant.colour }}</td>
+                        <td class="size-col delete-size" style="padding: 15px 20px; text-align: center;">{{ item.size_variant.size }}</td>
+                        <td class="quantity-col" style="padding: 15px 20px; text-align: center;">
+                            <div class="cart-product-quantity">
+
+                                <input type="number" class="form-control product-qty" value="{{item.quantity}}" min="1" max="10" step="1" data-decimals="0" required>
+                            </div><!-- End .cart-product-quantity -->                                 
+                        </td>
+                        <td class="total-col" style="padding: 15px 20px; text-align: center;">{{item.total_price}}</td>
+                        <td class="remove-col" style="padding: 15px 20px; text-align: center;">
+                            <button class="btn-remove delete-item" data-item="{{ item.id }}" 
+                            data-color="{{ item.color_variant }}" 
+                            data-size="{{ item.size_variant }}"  style="background: none; border: none; color: red;">
+                                <i class="icon-close"></i>
+                            </button>
+
+                        </td>
+                        <td>
+                            <button type="button" data-item="{{ item.id }}"  class="btn-md update-item" style="border: none; background: none; padding: 0;">
+                                <i class="icon-refresh"></i>
+                            </button>
+                        </td>
+                        
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table><!-- End .table table-wishlist -->
+            </div>
+            
+        </div><!-- End .col-lg-9 -->
+        <aside class="col-lg-3">
+            <div class="summary summary-cart">
+                <h3 class="summary-title">Cart Total</h3><!-- End .summary-title -->
+
+                <table class="table table-summary">
+                    <tbody>
+                        <tr class="summary-subtotal">
+                            <td>Subtotal:</td>
+                            <td>${{subtotal_amount}}</td>
+                        </tr><!-- End .summary-subtotal -->
+                        <tr class="summary-shipping">
+                            <td>Shipping:</td>
+                            <td>₹{{shipping_charge}}</td>
+                        </tr>
+
+                        {% comment %} <tr class="summary-shipping-row">
+                            <td>
+                                <div class="custom-control custom-radio">
+                                    <input type="radio" id="free-shipping" name="shipping" class="custom-control-input">
+                                    <label class="custom-control-label" for="free-shipping">Free Shipping</label>
+                                </div><!-- End .custom-control -->
+                            </td>
+                            <td>$0.00</td>
+                        </tr><!-- End .summary-shipping-row -->
+
+                        <tr class="summary-shipping-row">
+                            <td>
+                                <div class="custom-control custom-radio">
+                                    <input type="radio" id="standart-shipping" name="shipping" class="custom-control-input">
+                                    <label class="custom-control-label" for="standart-shipping">Standart:</label>
+                                </div><!-- End .custom-control -->
+                            </td>
+                            <td>$10.00</td>
+                        </tr><!-- End .summary-shipping-row -->
+
+                        <tr class="summary-shipping-row">
+                            <td>
+                                <div class="custom-control custom-radio">
+                                    <input type="radio" id="express-shipping" name="shipping" class="custom-control-input">
+                                    <label class="custom-control-label" for="express-shipping">Express:</label>
+                                </div><!-- End .custom-control -->
+                            </td>
+                            <td>$20.00</td>
+                        </tr><!-- End .summary-shipping-row --> {% endcomment %}
+
+                        {% comment %} <tr class="summary-shipping-estimate">
+                            <td>Estimate for Your Country<br> <a href="dashboard.html">Change address</a></td>
+                            <td>&nbsp;</td>
+                        </tr><!-- End .summary-shipping-estimate --> {% endcomment %}
+
+                        <tr class="summary-total">
+                            <td>Total:</td>
+                            <td>{{total_amount}}</td>
+                        </tr><!-- End .summary-total -->
+                    </tbody>
+                </table><!-- End .table table-summary -->
+                {% if total_items %}
+                
+                <a href="{% url "checkout" %}" class="btn btn-outline-primary-2 btn-order btn-block">PROCEED TO CHECKOUT</a>
+                {% endif %}
+            </div><!-- End .summary -->
+
+            <a href="{% url "shop" %}" class="btn btn-outline-dark-2 btn-block mb-3"><span>CONTINUE SHOPPING</span><i class="icon-refresh"></i></a>
+        </aside><!-- End .col-lg-3 -->
+    </div><!-- End .row -->
+</div><!-- End .container -->
+<script src="{% static 'assets/js/bootstrap-input-spinner.js' %}"></script>
+<script src="{% static 'assets/js/jquery.min.js' %}"></script>
+    <script src="{% static 'assets/js/bootstrap.bundle.min.js' %}"></script>
+    <script src="{% static 'assets/js/jquery.hoverIntent.min.js' %}"></script>
+    <script src="{% static 'assets/js/jquery.waypoints.min.js' %}"></script>
+    <script src="{% static 'assets/js/superfish.min.js' %}"></script>
+    <script src="{% static 'assets/js/owl.carousel.min.js' %}"></script>
+    <script src="{% static 'assets/js/jquery.magnific-popup.min.js' %}"></script>
+    <script src="{% static 'assets/js/jquery.plugin.min.js' %}"></script>
+    <script src="{% static 'assets/js/jquery.countdown.min.js' %}"></script>
+    <script src="{% static 'assets/js/bootstrap-input-spinner.js' %}"></script>
+    <script src="{% static 'assets/js/jquery.elevateZoom.min.js' %}"></script>
+    
+
+    
+    
+    <!-- Main JS File -->
+    <script src="{% static 'assets/js/main.js' %}"></script>
+    <script src="{% static 'assets/js/demos/demo-5.js' %}"></script>

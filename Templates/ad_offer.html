@@ -1,0 +1,150 @@
+{% extends "adminbase.html" %}
+{% load static %}
+
+
+{% block content %}
+
+<div class="container-xxl flex-grow-1 container-p-y mt-5" style="background-color:#E6E6FA">
+        
+        {% if message %}
+          <div class="alert alert-{{ message_type }} alert-dismissible fade show" role="alert">
+                  {{ message }}
+              <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+              </button>
+          </div>
+        {% endif %}
+
+    <!-- Product List Table -->
+    <div class="card-body card-widget-separator" style="border: 5px solid #A67BCA;">
+    <div class="card">
+        
+        <div class="card-body">
+            <div class="d-flex justify-content-between mb-3">
+                <a href="{% url "AddProductoffer" %} " class="btn btn-success">Add offer</a>
+                
+            </div>
+            <div class="card-datatable table-responsive">
+                <h3 class="text-center mb-4">Product Offers</h3>
+                <table class="table table-bordered">
+                    <thead class="thead-light">
+                        <tr>
+                            <th>NO</th>
+                            <th style="width: 20%;">PRODUCT</th>
+                            <th>DISCOUNT</th>
+                            <th>STARTDATE</th>
+                            <th>EXPDATE</th>
+                            <th>STATUS</th>
+                            <th>ACTION</th>
+                            
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for b in product_offer %}
+                        
+                        
+                        <tr>
+                            <td>{{ forloop.counter }}</td>
+                            <td>{{b.product}}</td>
+                            <td>{{b.discount_percentage}} %</td>
+                            <td>{{b.start_date | date:"d-m-Y" }}</td>
+                            <td>{{b.end_date| date:"d-m-Y"}}</td>
+                            <td>
+                                 <select class="form-control" name="status">
+                                        {% if b.is_active %}
+                                        <option value="True" selected>Active</option>
+                                        <option value="False">Inactive</option>
+                                        {% else %}
+                                        <option value="True">Active</option>
+                                        <option value="False" selected>Inactive</option>
+                                        {% endif %}
+                                    </select>
+                            </td>
+                            <td>
+                                <a href="{% url "editproductOffer" b.id %}" class="btn btn-primary">Edit</a>
+                                <a href="{% url "delete_productoffer" b.id %}" class="btn btn-danger">Delete</a>
+                            
+                            </td>
+                        </tr>
+                        
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    </div>
+
+    <!--brand offer -->
+    <div class="card-body card-widget-separator mt-3" style="border: 5px solid #A67BCA;">
+        <div class="card">
+           
+            <div class="card-body">
+                <div class="d-flex justify-content-between mb-3">
+                    <a href="{% url "AddBrandoffer" %}" class="btn btn-success">Add Offer</a>
+                    
+                </div>
+                <div class="card-datatable table-responsive">
+                    <h3 class="text-center mb-4">Brand Offers</h3>
+                    <table class="table table-bordered">
+                        <thead class="thead-light">
+                            <tr>
+                                <th>NO</th>
+                                <th>PRODUCT</th>
+                                <th>DISCOUNT</th>
+                                <th>STARTDATE</th>
+                                <th>EXPDATE</th>
+                                <th>STATUS</th>
+                                <th>ACTION</th>
+                                
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for bran in brand_offer %}
+                            
+                            
+                            <tr>
+                                <td>{{ forloop.counter }}</td>
+                                <td>{{bran.brand}}</td>
+                                <td>{{bran.discount_percentage}} %</td>
+                                <td>{{bran.start_date | date:"d-m-Y" }}</td>
+                                <td>{{bran.end_date| date:"d-m-Y"}}</td>
+                                <td>
+                                    <select class="form-control" name="status">
+                                        {% if bran.is_active %}
+                                        <option value="True" selected>Active</option>
+                                        <option value="False">Inactive</option>
+                                        {% else %}
+                                        <option value="True">Active</option>
+                                        <option value="False" selected>Inactive</option>
+                                        {% endif %}
+                                    </select>
+                                </td>
+                                <td>
+                                    <a href="{% url "editbrandOffer" bran.id %}" class="btn btn-primary">Edit</a>
+                                    <a href="{% url "delete_brandoffer" bran.id %}" class="btn btn-danger">Delete</a>
+                                
+                                </td>
+                            </tr>
+                            
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        </div>
+</div>
+
+
+
+                      
+            
+
+{% endblock content%}
+{% block js %}
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+{% endblock js %}

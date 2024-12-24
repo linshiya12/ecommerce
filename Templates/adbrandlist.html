@@ -1,0 +1,67 @@
+{% extends "adminbase.html" %}
+{% load static %}
+
+
+{% block content %}
+
+<div class="container-xxl flex-grow-1 container-p-y mt-5" style="background-color:#E6E6FA">
+        
+    
+    <!-- Product List Table -->
+    <div class="card-body card-widget-separator" style="border: 5px solid #A67BCA;">
+    <div class="card">
+        
+        <div class="card-body">
+            <div class="d-flex justify-content-between mb-3">
+                <a href="{% url "brandadd" %}" class="btn btn-success">Add Brand</a>
+                
+            </div>
+            <div class="card-datatable table-responsive">
+                <h1 class="text-center mb-4">Brand List</h1>
+                <table class="table table-bordered">
+                    <thead class="thead-light">
+                        <tr>
+                            <th>NO</th>
+                            <th>BRAND</th>
+                            <th>STATUS</th>
+                            <th>Action</th>
+                            
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for b in brand %}
+                        
+                        
+                        <tr>
+                            <td>{{ forloop.counter }}</td>
+                            <td>{{b.title}}</td>
+                            <td>
+                                <select class="form-control" name="status">
+                                    <option value="draft">{{b.brand_status}}</option>
+                                   
+                                </select>
+                            </td>
+                            <td><a href="{% url "brandedit" b.id%}" class="btn btn-primary">Edit</a></td>
+                        </tr>
+                        
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+
+
+
+                      
+            
+
+{% endblock content%}
+{% block js %}
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+{% endblock js %}

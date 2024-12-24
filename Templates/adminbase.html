@@ -79,6 +79,12 @@
 <link rel="stylesheet" href="{% static 'Met/assets/vendor/css/rtl/theme-default.css' %}" class="template-customizer-theme-css" />
 <link rel="stylesheet" href="{% static 'Met/assets/css/demo.css' %}" />
 
+<!-- crop js -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 
 
 Met/
@@ -90,6 +96,21 @@ Met/
       /* Maintain aspect ratio */
 
     }
+
+    .fade-out {
+      opacity: 0;
+      transition: opacity 0.5s ease-out;
+  }
+
+    #layout-menu {
+      background-color: #9b7bb5 !important;
+    }
+
+    body {
+      background-color: lavender !important;
+    }
+
+    
   </style>
 
   {% block links %}
@@ -101,8 +122,8 @@ Met/
   <!-- Helpers -->
   <script src="{% static 'Met/assets/vendor/js/helpers.js' %}"></script>
 
-  <script src="{% static 'Met/assets/vendor/js/template-customizer.js' %}"></script>
-  
+  {% comment %} <script src="{% static 'Met/assets/vendor/js/template-customizer.js' %}"></script>
+   {% endcomment %}
   <script src="{% static 'Met/assets/js/config.js' %}"></script>
 
 
@@ -148,13 +169,13 @@ Met/
 
           
           <li class="menu-item">
-            <a href="#" class="menu-link">
+            <a href="{% url "dashboard" %}" class="menu-link">
               <i class="menu-icon tf-icons ri-mail-open-line"></i>
               <div data-i18n="Dashboard">Dashboard</div>
             </a>
           </li>
           <li class="menu-item">
-            <a href="#" class="menu-link">
+            <a href="{% url "userdetails" %}" class="menu-link">
               <i class="menu-icon tf-icons ri-user-line"></i>
               <div data-i18n="Users">Users</div>
             </a>
@@ -166,24 +187,60 @@ Met/
             </a>
             <ul class="menu-sub">
               <li class="menu-item">
-                <a href="#" class="menu-link">
+                <a href="{% url "productlist" %}" class="menu-link">
                   <div data-i18n="Product List">Product list</div>
                 </a>
               </li>
               <li class="menu-item">
-                <a href="#" class="menu-link">
+                <a href="{% url "productadd" %}" class="menu-link">
                   <div data-i18n="Add Product">Add Product</div>
                 </a>
               </li>
+              
+            </ul>
+          </li>
+
+          <li class="menu-item">
+            <a href="javascript:void(0);" class="menu-link menu-toggle">
+              <i class="menu-icon tf-icons ri-shopping-bag-3-line"></i>
+              <div data-i18n="Category">Category</div>
+            </a>
+            <ul class="menu-sub">
               <li class="menu-item">
-                <a href="#" class="menu-link">
-                  <div data-i18n="Items List">Items List</div>
+                <a href="{% url "categoryview" %}" class="menu-link">
+                  <div data-i18n="Category List">Category list</div>
                 </a>
               </li>
+              <li class="menu-item">
+                <a href="{% url "categoryadd" %}" class="menu-link">
+                  <div data-i18n="Add Category">Add Category</div>
+                </a>
+              </li>
+              
+            </ul>
+          </li>
+
+          <li class="menu-item">
+            <a href="javascript:void(0);" class="menu-link menu-toggle">
+              <i class="menu-icon tf-icons ri-shopping-bag-3-line"></i>
+              <div data-i18n="brand">brand</div>
+            </a>
+            <ul class="menu-sub">
+              <li class="menu-item">
+                <a href="{% url "brandview" %}" class="menu-link">
+                  <div data-i18n="Brand List">Brand list</div>
+                </a>
+              </li>
+              <li class="menu-item">
+                <a href="{% url "brandadd" %}" class="menu-link">
+                  <div data-i18n="Add Brand">Add Brand</div>
+                </a>
+              </li>
+              
             </ul>
           </li>
           <li class="menu-item">
-            <a href="#" class="menu-link">
+            <a href="{% url "orderlist" %}" class="menu-link">
               <i class="menu-icon tf-icons ri-remixicon-line"></i>
               <div data-i18n="Orders">Orders</div>
             </a>
@@ -195,19 +252,19 @@ Met/
             </a>
           </li> -->
           <li class="menu-item">
-            <a href="#" class="menu-link">
+            <a href={% url "All_Coupons" %} class="menu-link">
               <i class="menu-icon tf-icons ri-checkbox-multiple-line"></i>
               <div data-i18n="Coupens">Coupens</div>
             </a>
           </li>
           <li class="menu-item">
-            <a href="#" class="menu-link">
+            <a href="{% url "All_Offers" %}" class="menu-link">
               <i class="menu-icon tf-icons ri-checkbox-multiple-line"></i>
               <div data-i18n="Offers">Offers</div>
             </a>
           </li>
           <li class="menu-item">
-            <a href="#" class="menu-link">
+            <a href="{% url "salesreport" %}" class="menu-link">
               <i class="menu-icon tf-icons ri-bar-chart-2-line"></i>
               <div data-i18n="Sales Report">Sales Report</div>
             </a>
@@ -227,7 +284,7 @@ Met/
             <span class="menu-header-text" data-i18n="account">account</span>
           </li>
           <li class="menu-item">
-            <a href="#" target="_blank" class="menu-link">
+            <a href="{% url "adminlogout" %}" target="_blank" class="menu-link">
               <i class="menu-icon tf-icons ri-lifebuoy-line"></i>
               <div data-i18n="Logout">Logout</div>
             </a>
@@ -324,7 +381,7 @@ Met/
                   
                   <li>
                     <div class="d-grid px-4 pt-2 pb-1">
-                      <a class="btn btn-danger d-flex" href="#" target="_blank">
+                      <a class="btn btn-danger d-flex" href="{% url "adminlogout" %}" target="_blank">
                         <small class="align-middle">Logout</small>
                     
                         <i class="ri-logout-box-r-line ms-2 ri-16px"></i>
@@ -428,11 +485,22 @@ Met/
   <!-- Main JS -->
   <script src="{% static 'Met/assets/js/main.js' %}"></script>
 
-
   <!-- Page JS -->
   <script src="{% static 'Met/assets/js/dashboards-crm.js' %}"></script>
 
-  {% block js %}
+  <script src="{% static 'assets/js/bootstrap.bundle.min.js' %}"></script>
+  <script src="{% static 'assets/js/bootstrap.bundle.min.js' %}"></script>
+
+  
+<script>
+  // Automatically dismiss alerts after 5 seconds
+  $(document).ready(function() {
+      $(".alert").delay(5000).fadeOut(300);
+  });
+</script>
+
+{% block js %}
+  
 
   {% endblock %}
 

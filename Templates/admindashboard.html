@@ -1,0 +1,193 @@
+{% extends "adminbase.html" %}
+{% load static %}
+{% block content %}
+<div class="container mt-5">
+    <!-- Filter Section -->
+    <div class="row mb-4">
+        <div class="col-md-12 d-flex justify-content-between align-items-center">
+            <h4>Admin Dashboard</h4>
+            <select id="timeFilter" onchange="updateChart()">
+                <option value="day">Day</option>
+                <option value="week">Week</option>
+                <option value="month">Month</option>
+                <option value="year">Year</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- Statistics Row -->
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h6>Total Ordered Items</h6>
+                </div>
+                <div class="card-body">
+                    <p>{{ total_ordered }} items</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h6>Total Returned Items</h6>
+                </div>
+                <div class="card-body">
+                    <p>{{ total_returned }} items</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h6>Total Canceled Items</h6>
+                </div>
+                <div class="card-body">
+                    <p>{{ total_cancelled }} items</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Row for Chart -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Sales and Revenue Trends</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="orderChart" width="400" height="200"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Top 10 Best Sellers -->
+    <div class="row">
+        <!-- Top 10 Products -->
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h6>Best Selling Products</h6>
+                </div>
+                <div class="card-body">
+                    <ul class="list-group" id="topProducts">
+                        {% for product in best_selling_products %}
+                            <li class="list-group-item">{{ forloop.counter }}. {{ product.product }} - {{ product.total_qty }} units</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Top 10 Categories -->
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h6>Best Selling Categories</h6>
+                </div>
+                <div class="card-body">
+                    <ul class="list-group" id="topCategories">
+                        {% for category, total_qty in best_selling_category %}
+                            <li class="list-group-item">{{ forloop.counter }}. {{ category }} - {{ total_qty }} units</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Top 10 Brands -->
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h6>Best Selling Brands</h6>
+                </div>
+                <div class="card-body">
+                    <ul class="list-group" id="topBrands">
+                        {% for brand, total_qty in best_selling_brand %}
+                            <li class="list-group-item">{{ forloop.counter }}. {{ brand }} - {{ total_qty }} units</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    console.log("Starting script...");
+
+    const dayData = JSON.parse('{{ day_data|escapejs }}');
+    const weekData = JSON.parse('{{ week_data|escapejs }}');
+    const monthData = JSON.parse('{{ month_data|escapejs }}');
+    const yearData = JSON.parse('{{ year_data|escapejs }}');
+
+    const dayLabels = dayData.labels;
+    const weekLabels = weekData.labels;
+    const monthLabels = monthData.labels;
+    const yearLabels = yearData.labels;
+
+    const dayChartData = dayData.data;
+    const weekChartData = weekData.data;
+    const monthChartData = monthData.data;
+    const yearChartData = yearData.data;
+
+    var ctx = document.getElementById('orderChart').getContext('2d');
+    if (!ctx) {
+        console.error("Canvas element not found!");
+    }
+
+    var orderChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: dayLabels,
+            datasets: [{
+                label: 'Total Orders (Day)',
+                data: dayChartData,
+                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                borderColor: 'rgba(75, 192, 192, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+
+    function updateChart() {
+        const filter = document.getElementById('timeFilter').value;
+
+        if (filter === 'day') {
+            orderChart.data.labels = dayLabels;
+            orderChart.data.datasets[0].data = dayChartData;
+            orderChart.data.datasets[0].label = 'Total Orders (Day)';
+        } else if (filter === 'week') {
+            orderChart.data.labels = weekLabels;
+            orderChart.data.datasets[0].data = weekChartData;
+            orderChart.data.datasets[0].label = 'Total Orders (Week)';
+        } else if (filter === 'month') {
+            orderChart.data.labels = monthLabels;
+            orderChart.data.datasets[0].data = monthChartData;
+            orderChart.data.datasets[0].label = 'Total Orders (Month)';
+        } else if (filter === 'year') {
+            orderChart.data.labels = yearLabels;
+            orderChart.data.datasets[0].data = yearChartData;
+            orderChart.data.datasets[0].label = 'Total Orders (Year)';
+        }
+
+        orderChart.update();
+    }
+</script>
+
+
+{% endblock %}

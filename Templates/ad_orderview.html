@@ -1,0 +1,215 @@
+{% extends "adminbase.html" %}
+{% load static %}
+{% block content %}
+<div class="card mb-6">
+    <div class="card-widget-separator-wrapper">
+        <div class="card-body card-widget-separator" style="border: 5px solid #A67BCA;">
+            <div class="container mt-5">
+                {% if message %}
+
+                <div class="alert alert-{{ message_type }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+        
+                {% endif %}
+
+
+                <h3>Product Details</h3>
+            
+                <div class="card-body">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item d-flex align-items-center">
+                            <strong>User:</strong><span>{{order.user}}</span>
+                        </li>
+                            
+                     
+                        <li class="list-group-item d-flex align-items-center">
+                            <strong>Total Amount:</strong><span>{{order.total_price}}</span>
+                        </li>
+                            
+                      
+                        <li class="list-group-item">
+                            <strong>Address:</strong><span>{{order.first_name}} {{order.last_name}},{{order.street}},{{order.state}},{{order.country}},{{order.postal_code}},ph-{{order.phone}},{{order.email}}</span>
+                        </li>
+                        
+                        <li class="list-group-item d-flex  align-items-center">
+                            <strong>Payment Method:</strong><span>{{order.payment_method}}</span>
+                        
+                        </li>
+
+                        <li class="list-group-item d-flex  align-items-center">
+                            <strong>Razorpay id:</strong><span>{{order.razorpay_payment_id}}</span>
+                        
+                        </li>
+
+                        
+                        <li class="list-group-item d-flex  align-items-center">
+                            <strong>Payment Status:</strong><span>{{order.paid_status}}</span>
+                            
+                        </li>
+                       
+                        <li class="list-group-item d-flex align-items-center">
+                            <strong>Date:</strong><span>{{order.updated_at}}</span>
+                            
+                        </li>
+                        <li class="list-group-item d-flex align-items-center">
+                            <strong>Status:</strong>
+                            <select 
+                                class="form-control status-dropdown" 
+                                data-order-id="{{ order.id }}" 
+                                style="background-color: Lavender; /* Light Greyish Blue */ border: 2px solid #A67BCA; color: #333; width: 150px; padding: 5px; font-size: 14px;">
+                                <option value="processing" {% if order.status == "processing" %}selected{% endif %}>Processing</option>
+                                <option value="shipped" {% if order.status == "shipped" %}selected{% endif %}>Shipped</option>
+                                <option value="delivered" {% if order.status == "delivered" %}selected{% endif %}>Delivered</option>
+                                <option value="cancelled" {% if order.status == "cancelled" %}selected{% endif %}>Cancelled</option>
+                                <option value="out for Delivery" {% if order.status == "out for Delivery" %}selected{% endif %}>Out For Delivery</option>
+                            </select>
+                        </li>
+                        
+                    </ul>
+                </div>
+               
+                
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body">
+       
+        <div class="card-datatable table-responsive">
+            <h3>Products</h3>
+            <table class="table table-bordered" style="border: 3px solid #A67BCA;">
+                <thead class="thead-light">
+                    <tr>
+                        <th>NO</th>
+                        <th></th>
+                        <th>Title</th>
+                        <th>invoice_no</th>
+                        <th>Color</th>
+                        <th>Size</th>
+                        <th>Quantity</th>
+                        <th>Price</th>
+                        <th>status</th>
+                        <th>Refund status</th>
+                        
+                    </tr>
+                </thead>
+                <tbody>
+                    
+                    {% for item in orderitems %}
+                    <tr>
+                        <td>{{forloop.counter}}</td>
+                        <td><img src="{{ item.image }}" alt="Product Image" width="100"></td>
+                        <td>{{item.product}}</td>
+                        <td>{{item.invoice_no}}</td>
+                        <td>{{item.colour}}</td>
+                        <td>{{item.size}}</td>
+                        <td>{{item.qty}}</td>
+                        <td>{{item.price}}</td>
+                        <td>{{item.cancel_status}}<br>{{item.return_status}}</td>
+                        <td>
+                            <select 
+                                class="form-control refund-dropdown" 
+                                data-orderitem-id="{{ item.id }}" 
+                                style="background-color: Lavender; /* Light Greyish Blue */ border: 2px solid #A67BCA; color: #333; width: 150px; padding: 5px; font-size: 14px;">
+                                <option value="processing" {% if item.refund_status == "processing" %}selected{% endif %}>Processing</option>
+                                <option value="Refunded" {% if item.refund_status == "Refunded" %}selected{% endif %}>Refunded</option>
+                               
+                            </select>
+                        </td>
+                        
+                    </tr>
+                    
+                    {% endfor %}
+                    
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block js %}
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
+<script>
+$(document).ready(function() {
+    $(".status-dropdown").change(function() {
+        var orderId = $(this).data("order-id");
+        var newStatus = $(this).val();
+        
+        $.ajax({
+            url: "/update-order-status",  // The URL of your Django view to update status
+            type: "POST",
+            data: {
+                'order_id': orderId,
+                'status': newStatus,
+                'csrfmiddlewaretoken': '{{ csrf_token }}'  // CSRF Token for security
+            },
+            success: function(response) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Success',
+                    text: response.message,
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+            },
+            error: function(xhr, status, error) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: "Error updating status: " + error,
+                });
+            }
+            
+        });
+    });
+});
+</script>
+
+<script>
+    $(document).ready(function() {
+        $(".refund-dropdown").change(function() {
+            var itemId = $(this).data("orderitem-id");
+            var newStatus = $(this).val();
+           
+            $.ajax({
+                url: "/update-refund-status",  // The URL of your Django view to update status
+                type: "POST",
+                data: {
+                    'item_id': itemId,
+                    'status': newStatus,
+                    'csrfmiddlewaretoken': '{{ csrf_token }}'  // CSRF Token for security
+                },
+                success: function(response) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Success',
+                        text: response.message,
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
+                },
+                error: function(xhr, status, error) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: "Error updating status: " + error,
+                    });
+                }
+                
+            });
+        });
+    });
+    </script>
+
+
+{% endblock js %}
+

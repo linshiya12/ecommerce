@@ -1,0 +1,143 @@
+{% extends "adminbase.html" %}
+{% load static %}
+
+{% block css %}
+
+<style>
+    body {
+        background-color: #f8f9fa;
+    }
+    .container {
+        background: white;
+        border-radius: 8px;
+        padding: 30px; /* Increased padding */
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+    .form-group {
+        margin-bottom: 30px; /* Increased space between fields */
+    }
+    .form-group label {
+        font-weight: bold;
+    }
+    .current-image {
+        margin-top: 10px;
+    }
+    button {
+        margin-top: 20px; /* Added space before the submit button */
+    }
+</style>
+
+{% endblock css %}
+{% block content %}
+
+<div class="container-xxl flex-grow-1 container-p-y mt-5" style="background-color:#E6E6FA">
+        
+    <!-- Product List Widget -->
+    <div class="card mb-6">
+
+        <div class="card-widget-separator-wrapper">
+            
+            <div class="card-body card-widget-separator" style="border: 5px solid #A67BCA;">
+                {% if message %}
+                <div class="alert alert-{{ message_type }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                {% endif %}
+                <div class="container mt-5">
+        
+                    <form action="" method="POST" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <input type="hidden" name="_csrf" value="your_csrf_token_here">
+                        <div class="form-group">
+                            <label for="variant">Colour <span class="text-danger">*</span></label>
+                            <select class="form-control" id="variant" name="variant" required>
+                                {% for variant in variants %}
+                                <option value="{{ variant.id }}" {% if variantsize.variant.id == variant.id %}selected{% endif %}>
+                                    {{ variant.colour }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="size">Size</label>
+                            <select class="form-control" id="size" name="size" required>
+                                <option value="xxl" {% if variantsize.size == "xxl"%}selected{% endif %}>xxl</option>
+                                <option value="xl" {% if variantsize.size == "xl" %}selected{% endif %}>xl</option>
+                                <option value="lg" {% if variantsize.size == "lg" %}selected{% endif %}>lg</option>
+                                <option value="md" {% if variantsize.size == "md" %}selected{% endif %}>md</option>
+                                <option value="sm" {% if variantsize.size == "sm" %}selected{% endif %}>sm</option>
+                                <option value="xs" {% if variantsize.size == "xs" %}selected{% endif %}>xs</option>
+
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="size_status">Size Status</label>
+                            <select class="form-control" id="size_status" name="size_status" required>
+                                <option value="draft" {% if variantsize.size_status == "draft" %}selected{% endif %}>Draft</option>
+                                <option value="published" {% if variantsize.size_status == "published" %}selected{% endif %}>Published</option>
+                                <option value="in_review" {% if variantsize.size_status == "in_review" %}selected{% endif %}>In Review</option>
+                                <option value="disabled" {% if variantsize.size_status == "disabled" %}selected{% endif %}>Disabled</option>
+                                <option value="rejected" {% if variantsize.size_status == "rejected" %}selected{% endif %}>Rejected</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="stock">Stock</label>
+                            <select class="form-control" id="stock" name="stock" required>
+                                <option value="stock_in" {% if variantsize.stock == "stock_in" %}selected{% endif %}>Stock In</option>
+                                <option value="stock_out" {% if variantsize.stock == "stock_out" %}selected{% endif %}>Stock Out</option>
+                            </select>
+                        </div>
+                       
+                        <div class="form-group">
+                            <label for="quantity">Quantity<span class="text-danger">*</span></label>
+                            <input type="number" class="form-control" id="quantity" name="quantity" value="{{ variantsize.quantity }}" min="0" max="100" required>
+                        </div>
+                        
+                        
+                        <button type="submit" class="btn btn-primary">Update Product</button>
+                        
+                    </form>
+                   
+                </div>
+                
+                
+            </div>
+        </div>
+    </div>
+
+    
+</div>
+
+
+{% endblock content %}
+
+{% block js %}
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+<script>
+    // Bootstrap 4 custom validation
+    (function() {
+        'use strict';
+        window.addEventListener('load', function() {
+            var form = document.getElementById('editProductForm');
+            form.addEventListener('submit', function(event) {
+                if (form.checkValidity() === false) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                form.classList.add('was-validated');
+            }, false);
+        }, false);
+    })();
+</script>
+
+{% endblock js %}

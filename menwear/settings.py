@@ -55,25 +55,13 @@ INSTALLED_APPS = [
     
 
 ]
+from dotenv import load_dotenv
 
+load_dotenv()
 
-SOCIALACCOUNT_PROVIDERS = {
-    "google":{
-        "SCOPE":[
-            "profile",
-            "email"
-        ],
-        "AUTH_PARAMS":{
-            "access_type":"online"
-        }
-    }
-}
+GOOGLE_CLIENT_ID=os.getenv('GOOGLE_CLIENT_ID')
+GOOGLE_CLIENT_SECRET=os.getenv('GOOGLE_CLIENT_SECRET')
 
-
-AUTHENTICATION_BACKENDS = (
-    'allauth.account.auth_backends.AuthenticationBackend',
-    'django.contrib.auth.backends.ModelBackend',
-)
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -84,6 +72,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'allauth.account.middleware.AccountMiddleware',
+    
 ]
 
 ROOT_URLCONF = 'menwear.urls'
@@ -99,6 +88,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                
             ],
         },
     },
@@ -158,7 +148,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
 STATIC_ROOT=os.path.join(BASE_DIR,'staticfiles')
 STATICFILES_DIRS=[os.path.join(BASE_DIR,'static')]
 MEDIA_URL='/media/'
@@ -188,3 +178,6 @@ DEFAULT_FROM_EMAIL = 'linshifiyas@gmail.com'
 LOGIN_REDIRECT_URL="/"
 SIGNUP_REDIRECT_URL="/"
 LOGOUT_REDIRECT_URL="/"
+
+RAZORPAY_KEY_ID ='rzp_test_5o7u3RpGUNj1gY'
+RAZORPAY_SECRET_KEY ='C2syWtSvsp5yeWnlD9ZIQbDL'

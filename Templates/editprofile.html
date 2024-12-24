@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+
+<div class="login-page bg-image pt-8 pb-8 pt-md-12 pb-md-12 pt-lg-17 pb-lg-17" style="background-image: url({% static 'assets/images/backgrounds/login-bg.jpg' %}); height:800px;">
+
+    <div class="page-content">
+        <div class="checkout">
+            <div class="container">
+                <div class="summary">
+                    <form id="editProfileForm" method="POST" action="">
+                        {% csrf_token %}
+                        {% if message %}
+                            <div class="alert alert-{{ message_type }} alert-dismissible fade show m-4" role="alert">
+                                {{ message }}
+                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                        {% endif %}
+                        <div class="row">
+                            <div class="col-lg-9">
+                                <h2 class="checkout-title">Edit Profile</h2>
+
+                                <div class="row">
+                                    <div class="col-sm-6">
+                                        <label for="username">Username *</label>
+                                        <input type="text" class="form-control" name="username" id="username" value="{{ user.username }}" required>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="col-sm-6">
+                                        <label for="phone">Phone *</label>
+                                        <input type="tel" class="form-control" name="phone" id="phone" value="{{ user.phoneno }}" required>
+                                    </div>
+                                </div>
+
+                                <button type="submit" class="btn btn-primary mt-3">Update</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div><!-- End .container -->
+        </div><!-- End .checkout -->
+    </div><!-- End .page-content -->
+</div>
+
+{% endblock %}
+
+{% block js %}
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+    document.getElementById('editProfileForm').addEventListener('submit', function(event) {
+        let valid = true;
+
+        // Function to check if the input value contains only spaces
+        function isNotEmpty(value) {
+            return value.trim() !== ''; // Check if value is not just spaces
+        }
+
+        // Username Validation: Check if it contains spaces
+        const username = document.getElementById('username').value;
+        if (!isNotEmpty(username) || username.includes(' ')) {
+            valid = false;
+            Swal.fire({
+                icon: 'error',
+                title: 'Invalid Username',
+                text: 'Username cannot contain spaces and cannot be empty.',
+            });
+        }
+
+        // Phone Validation: Must be between 10 and 15 digits
+        const phone = document.getElementById('phone').value;
+        if (!isNotEmpty(phone) || phone.length < 10 || phone.length > 15 || isNaN(phone)) {
+            valid = false;
+            Swal.fire({
+                icon: 'error',
+                title: 'Invalid Phone Number',
+                text: 'Phone number must be between 10 and 15 digits.',
+            });
+        }
+
+        // If any validation fails, prevent form submission
+        if (!valid) {
+            event.preventDefault();
+        }
+    });
+</script>
+{% endblock js %}

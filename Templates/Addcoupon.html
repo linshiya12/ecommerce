@@ -1,0 +1,145 @@
+{% extends "adminbase.html" %}
+{% load static %}
+
+{% block css %}
+
+<style>
+    body {
+        background-color: #f8f9fa;
+    }
+    .container {
+        background: white;
+        border-radius: 8px;
+        padding: 30px; /* Increased padding */
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+    .form-group {
+        margin-bottom: 30px; /* Increased space between fields */
+    }
+    .form-group label {
+        font-weight: bold;
+    }
+    .current-image {
+        margin-top: 10px;
+    }
+    button {
+        margin-top: 20px; /* Added space before the submit button */
+    }
+</style>
+
+{% endblock css %}
+{% block content %}
+
+
+<div class="container-xxl flex-grow-1 container-p-y mt-5" style="background-color:#E6E6FA">
+    
+    <!-- Product List Widget -->
+    <div class="card mb-6">
+        <div class="card-widget-separator-wrapper">
+            <div class="card-body card-widget-separator" style="border: 5px solid #A67BCA;">
+
+                {% if message %}
+                <div class="alert alert-{{ message_type }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                {% endif %}
+                
+                <div class="container mt-5">
+        
+                    <form action="" method="POST" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <!-- CSRF Token (if needed in your backend) -->
+                        <input type="hidden" name="_csrf" value="your_csrf_token_here">
+                        
+                        <div class="form-group">
+                            <label for="code">Coupon code<span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="coupon" name="code">
+
+                        </div>
+                    
+                        <div class="form-group">
+                            <label for="discount">Discount (%)</label>
+                            <input type="number" class="form-control" id="discount" name="discount_percentage" value="0" min="0" max="100" step="1">
+                        </div>
+                        
+
+                        <div class="form-group">
+                            <label for="usage_limit">Usage limit</label>
+                            <input type="number" class="form-control" id="usage_limit" name="usage_limit" value="{{ coupon_code.usage_limit }}" min="1" max="100" step="1" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="min_purchase_amount">Min amount</label>
+                            <input type="number" class="form-control" id="min_price" name="min_purchase_amount" value="0" min="1" step="1" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="max_discount_amount">Max amount</label>
+                            <input type="number" class="form-control" id="max_price" name="max_discount_amount" value="0" min="1" step="1" required>
+                        </div>
+
+
+                        <div class="form-group">
+                            <label for="start_date">Date<span class="text-danger">*</span></label>
+                            <input type="date" class="form-control" id="date" name="start_date" value="" required>
+                            
+                        </div>
+
+                        <div class="form-group">
+                            <label for="end_date">Exp Date<span class="text-danger">*</span></label>
+                            <input type="date" class="form-control" id="date" name="end_date" value="" required>
+                            
+                        </div>
+
+                        <div class="form-group">
+                            <label for="active">Stock</label>
+                            <select class="form-control" id="stock" name="active">
+                                <option value="True">Active</option>
+                                <option value="False" selected>Inactive</option>
+                            </select>
+                        </div>
+                    
+                        
+                    
+                        <button type="submit" class="btn btn-primary">Add Coupon</button>
+                    </form>
+                    
+                   
+                </div>
+                
+                
+            </div>
+        </div>
+    </div>
+
+    
+</div>
+
+
+{% endblock content %}
+
+{% block js %}
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+<script>
+    // Bootstrap 4 custom validation
+    (function() {
+        'use strict';
+        window.addEventListener('load', function() {
+            var form = document.getElementById('editProductForm');
+            form.addEventListener('submit', function(event) {
+                if (form.checkValidity() === false) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                form.classList.add('was-validated');
+            }, false);
+        }, false);
+    })();
+</script>
+
+{% endblock %}

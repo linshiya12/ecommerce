@@ -1,0 +1,143 @@
+{% extends "adminbase.html" %}
+{% load static %}
+
+{% block css %}
+<style>
+    body {
+        background-color: #f8f9fa;
+    }
+
+    .container {
+        background: white;
+        border-radius: 8px;
+        padding: 30px; /* Increased padding */
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .form-group {
+        margin-bottom: 30px; /* Increased space between fields */
+    }
+
+    .form-group label {
+        font-weight: bold;
+    }
+
+    .current-image {
+        margin-top: 10px;
+    }
+
+    button {
+        margin-top: 20px; /* Added space before the submit button */
+    }
+
+    .alert-dismissible {
+        margin-top: 15px;
+    }
+</style>
+{% endblock css %}
+
+{% block content %}
+
+<div class="container-xxl flex-grow-1 container-p-y mt-5" style="background-color:#E6E6FA">
+    <div class="card mb-6">
+        <div class="card-widget-separator-wrapper">
+            <div class="card-body card-widget-separator" style="border: 5px solid #A67BCA;">
+                <!-- Display Django Messages -->
+                
+            {% if message %}
+                <div class="alert alert-{{ message_type }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+            {% endif %}
+            
+                <!-- Form Section -->
+                <div class="container mt-5">
+                    <form action="" method="POST" enctype="multipart/form-data" id="editOfferForm" novalidate>
+                        {% csrf_token %}
+                    
+                        <!-- Product Selection -->
+                        <div class="form-group">
+                            <label for="code"> Coupon Code <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="coupon" name="code" value="{{ coupon_code.code }}" required>
+                        </div>
+                    
+                        <!-- Discount Percentage -->
+                        <div class="form-group">
+                            <label for="discount">Discount (%)</label>
+                            <input type="number" class="form-control" id="discount" name="discount_percentage" value="{{ coupon_code.discount_percentage }}" min="1" max="100" step="1" required>
+                        </div>
+                    
+                        
+                        
+                        <div class="form-group">
+                            <label for="usage_limit">Usage limit </label>
+                            <input type="number" class="form-control" id="usage_limit" name="usage_limit" value="{{ coupon_code.usage_limit }}" min="1" max="100" step="1" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="min_purchase_amount">Min amount</label>
+                            <input type="number" class="form-control" id="min_price" name="min_purchase_amount" value="{{ coupon_code.min_purchase_amount }}" min="1" step="1" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="max_discount_amount">Max amount</label>
+                            <input type="number" class="form-control" id="max_price" name="max_discount_amount" value="{{ coupon_code.max_discount_amount}}" min="1" step="1" required>
+                        </div>
+
+                        <!-- Start Date -->
+                        <div class="form-group">
+                            <label for="start_date">Start Date <span class="text-danger">*</span></label>
+                            <input type="date" class="form-control" id="start_date" name="start_date" value="{{ coupon_code.start_date|date:"Y-m-d" }}" required>
+                        </div>
+
+                        <!-- End Date -->
+                        <div class="form-group">
+                            <label for="end_date">Expiration Date <span class="text-danger">*</span></label>
+                            <input type="date" class="form-control" id="end_date" name="end_date" value="{{coupon_code.end_date|date:"Y-m-d" }}" required>
+                        </div>
+                    
+                        <!-- Active Status -->
+                        <div class="form-group">
+                            <label for="active">Status <span class="text-danger">*</span></label>
+                            <select class="form-control" id="is_active" name="active" required>
+                                <option value="True" {% if coupon_code.active %}selected{% endif %}>active</option>
+                                <option value="False" {% if not coupon_code.active %}selected{% endif %}>inactive</option>
+                            </select>
+                        </div>
+                    
+                        <!-- Submit Button -->
+                        <button type="submit" class="btn btn-primary">Update Coupon</button>
+                    </form>
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock content %}
+
+{% block js %}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/5.3.0/js/bootstrap.min.js"></script>
+
+<script>
+    // Bootstrap 5 custom validation
+    (function() {
+        'use strict';
+        window.addEventListener('load', function() {
+            var form = document.getElementById('editCategoryForm');
+            form.addEventListener('submit', function(event) {
+                if (form.checkValidity() === false) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                form.classList.add('was-validated');
+            }, false);
+        }, false);
+    })();
+</script>
+{% endblock js %}

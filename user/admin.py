@@ -6,7 +6,7 @@ class VariantImagesAdmin(admin.TabularInline):
 
 class ProductAdmin(admin.ModelAdmin):
     # inlines = [ProductImagesAdmin]
-    list_display = ['user','title','featured','product_status']
+    list_display = ['title','featured','product_status']
 
 
 class CategoryAdmin(admin.ModelAdmin):
@@ -30,12 +30,26 @@ class VariantAdmin(admin.ModelAdmin):
     list_display = ['colour']
     inlines = [VariantImagesAdmin]
 
+
+admin.site.register(ProductOffer),
+admin.site.register(BrandOffer),
 admin.site.register(Product,ProductAdmin)
 admin.site.register(Category,CategoryAdmin)
 
 admin.site.register(VariantSize)
 admin.site.register(Variant,VariantAdmin)
-admin.site.register(Brand)
+admin.site.register(Brand),
+admin.site.register(Cart),
+admin.site.register(CartItem),
+admin.site.register(ShippingAddress),
+admin.site.register(Cart_Order),
+admin.site.register(OrderItems),
+admin.site.register(WishlistItem),
+admin.site.register(Coupon),
+admin.site.register(Wallet),
+admin.site.register(Wishlist),
+admin.site.register(Review),
+admin.site.register(CouponUsage),
 
 
 

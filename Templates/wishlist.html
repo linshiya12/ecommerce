@@ -3,118 +3,155 @@
 {% block content %}
 
 <main class="main">
-    
     <nav aria-label="breadcrumb" class="breadcrumb-nav">
-        <div class="container">
+        <div class="container ">
             <ol class="breadcrumb">
                 <li class="breadcrumb-item"><a href="/home/">Home</a></li>
                 <li class="breadcrumb-item"><a href="/shop/">Shop</a></li>
                 <li class="breadcrumb-item active" aria-current="page">Wishlist</li>
             </ol>
-        </div><!-- End .container -->
-    </nav><!-- End .breadcrumb-nav -->
+        </div>
+    </nav>
 
-    <div class="page-content">
-        <div class="container">
+    <div class="page-content m-5">
+        <div class="container" id="wishList">
+           {% if wishlist_items_with_stock_status %}
+           
             <table class="table table-wishlist table-mobile">
                 <thead>
                     <tr>
                         <th>Product</th>
                         <th>Price</th>
-                        <th>Stock Status</th>
+                        <th>Color</th>
+                        <th>Size</th>
+                        <th>Quantity</th>
                         <th></th>
                         <th></th>
                     </tr>
                 </thead>
-
                 <tbody>
+                    {% for item in wishlist_items_with_stock_status %}
                     <tr>
                         <td class="product-col">
                             <div class="product">
                                 <figure class="product-media">
-                                    <a href="#">
-                                        <img src="{% static 'assets/images/products/table/product-1.jpg' %}" alt="Product image">
+                                    <a href="{% url 'product_detail' item.item.product.id %}">
+                                        <img src="{{ item.item.image.image.url }}" alt="Product image">
                                     </a>
                                 </figure>
-
                                 <h3 class="product-title">
-                                    <a href="#">Beige knitted elastic runner shoes</a>
-                                </h3><!-- End .product-title -->
-                            </div><!-- End .product -->
-                        </td>
-                        <td class="price-col">$84.00</td>
-                        <td class="stock-col"><span class="in-stock">In stock</span></td>
-                        <td class="action-col">
-                            <div class="dropdown">
-                            <button class="btn btn-block btn-outline-primary-2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <i class="icon-list-alt"></i>Select Options
-                            </button>
-
-                            <div class="dropdown-menu">
-                                <a class="dropdown-item" href="#">First option</a>
-                                <a class="dropdown-item" href="#">Another option</a>
-                                <a class="dropdown-item" href="#">The best option</a>
-                              </div>
+                                    <a href="{% url 'product_detail' item.item.product.id %}">{{ item.item.product.title }}</a>
+                                </h3>
                             </div>
                         </td>
-                        <td class="remove-col"><button class="btn-remove"><i class="icon-close"></i></button></td>
+                        <td class="wish-price">{{ item.item.price }}</td>
+                        <td>{{ item.item.color_variant.colour }}</td>
+                        <td>{{ item.item.size_variant.size }}</td>
+                        <td>{{ item.item.quantity }}</td>
+                        <td>
+                            {% if item.size_stock_status == 'Out of Stock' %}
+                            <button class="btn btn-outline-primary-2 disabled">Out of Stock</button>
+                            {% else %}
+                            <button 
+                                class="btn btn-outline-primary-2 add-to-cart"
+                                data-product-id="{{ item.item.product.id }}"
+                                data-color-id="{{ item.item.color_variant.id }}"
+                                data-size-id="{{ item.item.size_variant.size }}"
+                                data-qty="{{ item.item.quantity }}"
+                                data-price="{{ item.item.price }}"
+                            >Add to Cart</button>
+                            {% endif %}
+                        </td>
+                        <td class="remove-col"><button class="btn-remove remove-item" data-remove="{{item.item.id}}"><i class="icon-close"></i></button></td>
                     </tr>
-                    <tr>
-                        <td class="product-col">
-                            <div class="product">
-                                <figure class="product-media">
-                                    <a href="#">
-                                        <img src="{% static 'assets/images/products/table/product-2.jpg' %}" alt="Product image">
-                                    </a>
-                                </figure>
-
-                                <h3 class="product-title">
-                                    <a href="#">Blue utility pinafore denim dress</a>
-                                </h3><!-- End .product-title -->
-                            </div><!-- End .product -->
-                        </td>
-                        <td class="price-col">$76.00</td>
-                        <td class="stock-col"><span class="in-stock">In stock</span></td>
-                        <td class="action-col">
-                            <button class="btn btn-block btn-outline-primary-2"><i class="icon-cart-plus"></i>Add to Cart</button>
-                        </td>
-                        <td class="remove-col"><button class="btn-remove"><i class="icon-close"></i></button></td>
-                    </tr>
-                    <tr>
-                        <td class="product-col">
-                            <div class="product">
-                                <figure class="product-media">
-                                    <a href="#">
-                                        <img src="{% static 'assets/images/products/table/product-3.jpg' %}" alt="Product image">
-                                    </a>
-                                </figure>
-
-                                <h3 class="product-title">
-                                    <a href="#">Orange saddle lock front chain cross body bag</a>
-                                </h3><!-- End .product-title -->
-                            </div><!-- End .product -->
-                        </td>
-                        <td class="price-col">$52.00</td>
-                        <td class="stock-col"><span class="out-of-stock">Out of stock</span></td>
-                        <td class="action-col">
-                            <button class="btn btn-block btn-outline-primary-2 disabled">Out of Stock</button>
-                        </td>
-                        <td class="remove-col"><button class="btn-remove"><i class="icon-close"></i></button></td>
-                    </tr>
+                    {% endfor %}
                 </tbody>
-            </table><!-- End .table table-wishlist -->
-            <div class="wishlist-share">
-                <div class="social-icons social-icons-sm mb-2">
-                    <label class="social-label">Share on:</label>
-                    <a href="#" class="social-icon" title="Facebook" target="_blank"><i class="icon-facebook-f"></i></a>
-                    <a href="#" class="social-icon" title="Twitter" target="_blank"><i class="icon-twitter"></i></a>
-                    <a href="#" class="social-icon" title="Instagram" target="_blank"><i class="icon-instagram"></i></a>
-                    <a href="#" class="social-icon" title="Youtube" target="_blank"><i class="icon-youtube"></i></a>
-                    <a href="#" class="social-icon" title="Pinterest" target="_blank"><i class="icon-pinterest"></i></a>
-                </div><!-- End .soial-icons -->
-            </div><!-- End .wishlist-share -->
-        </div><!-- End .container -->
-    </div><!-- End .page-content -->
-</main><!-- End .main -->
+            </table>
+            {% else %}
+                <div class="empty-cart-container text-center" style="margin: 0px auto; padding: 10px; border: 1px solid #ddd; border-radius: 15px; background: linear-gradient(135deg, #f9f9f9, #ffffff); box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); max-width: 600px;">
+                    <div style="font-size: 90px; color: #ff6f61;">
+                        <i class="icon-heart"></i>
+                    </div>
+                    <h2 style="color: #333; font-size: 30px; margin-top: 0px; font-weight: bold;">Your wishlist is Empty</h2>
+                    <p style="color: #555; font-size: 18px; margin-top: 10px; line-height: 1.5;">
+                        Looks like you haven't added anything to your wishlist yet.<br>
+                        Start exploring our collections now!
+                    </p>
+                    <a href="{% url 'shop' %}" class="btn btn-primary" style="margin-top: 25px; padding: 12px 30px; font-size: 16px; border-radius: 25px; background-color: #ff6f61; border: none; color: #fff; text-transform: uppercase;">
+                        Shop Now
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</main>
 
 {% endblock content %}
+
+{% block js %}
+<script>
+    $(document).ready(function() {
+        $(".add-to-cart").on('click', function() {
+            var _button = $(this);
+            var _productId = _button.data('product-id');
+            var _colorId = _button.data('color-id');
+            var _sizeId = _button.data('size-id');
+            var _qty = _button.data('qty');
+            var _price = _button.data('price');
+
+            $.ajax({
+                url: '/add-tocart',  // Update this to match your URL
+                
+                data: {
+                    'id': _productId,
+                    'qty': _qty,
+                    'price': _price,
+                    'color_variant': _colorId,
+                    'size_variant': _sizeId,
+                    
+                },
+                dataType: 'json',
+                beforeSend: function() {
+                    _button.attr('disabled', true);  // Disable button to prevent multiple clicks
+                },
+                success: function(res) {
+                    $(".cart-count").text(res.totalitems);  // Update cart count
+                    alert('Item added to cart successfully!');
+                    _button.attr('disabled', false);  // Re-enable button
+                },
+                error: function(xhr, status, error) {
+                    alert('Failed to add item to cart.');
+                    _button.attr('disabled', false);  // Re-enable button
+                }
+            });
+        });
+    });
+</script>
+<script>
+    $(document).on('click','.remove-item',function(){
+        var _vm=$(this);
+        var _pId=$(this).attr('data-remove');
+       
+
+        $.ajax({
+            url:'/delete-towishlist',
+            data:{
+                'id':_pId,
+                
+            },
+            dataType:'json',
+            beforeSend:function(){
+                _vm.attr('disabled',true);
+            },
+            success:function(res){
+                $(".wish-count").text(res.totalitems)
+                _vm.attr('disabled',false);
+                $("#wishList").html(res.data);
+            }
+
+
+           })
+
+    });
+    </script>
+{% endblock js %}

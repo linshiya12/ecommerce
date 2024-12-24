@@ -1,0 +1,149 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="login-page bg-image pt-8 pb-8 pt-md-12 pb-md-12 pt-lg-17 pb-lg-17" style="background-image: url({% static 'assets/images/backgrounds/login-bg.jpg' %}); height: 100%;">
+    <div class="container my-5">
+        <div class="row justify-content-center">
+            <!-- Sidebar Navigation -->
+            <aside class="col-md-4 col-lg-3 mb-4">
+                <div class="card" style="border: 1px solid #dee2e6; border-radius: 8px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); text-align: center;">
+                    <div class="card-header" style="background-color: #007bff; color: #fff; font-weight: bold; padding: 1rem; border-bottom: 1px solid #dee2e6;">
+                        My Account
+                    </div>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item">
+                            <a class="nav-link {% if request.resolver_match.url_name == 'account' %}active{% endif %}" href="{% url 'account' %}" style="color: #333; text-decoration: none; font-size: 16px;">
+                                <i class="icon-user text-primary" style="margin-right: 10px; font-size: 18px;"></i> Account Details
+                            </a>
+                        </li>
+                        <li class="list-group-item">
+                            <a class="nav-link {% if request.resolver_match.url_name == 'order' %}active{% endif %}" href="{% url 'order' %}" style="color: #333; text-decoration: none; font-size: 16px;">
+                                <i class="icon-bag text-primary" style="margin-right: 10px; font-size: 18px;"></i> Orders
+                            </a>
+                        </li>
+                         <li class="list-group-item">
+                            <a class="nav-link {% if request.resolver_match.url_name == 'mywallet' %}active{% endif %}" 
+                               href="{% url 'mywallet' %}" 
+                               style="color: #333; text-decoration: none; font-size: 16px;">
+                                <i class="icon-map text-primary" style="margin-right: 10px; font-size: 18px;"></i> My Wallet
+                            </a>
+                        </li> 
+                        <li class="list-group-item">
+                            <a class="nav-link {% if request.resolver_match.url_name == 'address' %}active{% endif %}" href="{% url 'address' %}" style="color: #333; text-decoration: none; font-size: 16px;">
+                                <i class="icon-map text-primary" style="margin-right: 10px; font-size: 18px;"></i> Addresses
+                            </a>
+                        </li>
+                        <li class="list-group-item">
+                            <a class="nav-link {% if request.resolver_match.url_name == 'resetpass' %}active{% endif %}" href="{% url 'resetpass' %}" style="color: #333; text-decoration: none; font-size: 16px;">
+                                <i class="icon-lock text-primary" style="margin-right: 10px; font-size: 18px;"></i> Reset Password
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </aside>
+
+            <!-- Main Content -->
+            <div class="col-md-8 col-lg-9">
+                <div class="card" style="border: 1px solid #dee2e6; border-radius: 8px; background-color: #ffffff; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); padding: 30px;">
+                    <h3 class="card-title text-center" style="color: #007bff; font-weight: bold; margin-bottom: 20px;">Product Details</h3>
+
+                    <table class="table table-striped table-bordered" style="margin-bottom: 30px;">
+                        <thead class="thead-dark">
+                            <tr>
+                                <th style="padding: 15px 20px; text-align: left;">Product</th>
+                                <th style="padding: 15px 20px; text-align: center;">Title</th>
+                                <th style="padding: 15px 20px; text-align: center;">Color</th>
+                                <th style="padding: 15px 20px; text-align: center;">Size</th>
+                                <th style="padding: 15px 20px; text-align: center;">Quantity</th>
+                                <th style="padding: 15px 20px; text-align: center;">Price</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td style="padding: 15px 20px; text-align: left;">
+                                    <img src="{{ order.image }}" alt="Product image" style="width: 100px; height: auto;">
+                                </td>
+                                <td style="padding: 15px 20px; text-align: center;">{{ order.product.title }}</td>
+                                <td style="padding: 15px 20px; text-align: center;">{{ order.colour }}</td>
+                                <td style="padding: 15px 20px; text-align: center;">{{ order.size }}</td>
+                                <td style="padding: 15px 20px; text-align: center;">{{ order.qty }}</td>
+                                <td style="padding: 15px 20px; text-align: center;">{{ order.price }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <!-- Conditional Messages for Refund / Return -->
+                    <div class="product-status mt-4">
+{% if order.order.status == 'delivered' or order.order.status == 'Returned' %}
+    {% if order.return_status == 'Returned' %}
+        {% if order.refund_status == 'Refunded' %}
+            <p class="font-weight-bold text-danger">Refund Status: This product has been refunded.</p>
+            <a href="{% url 'mywallet' %}" class="btn btn-success">Check Wallet</a>
+        {% elif order.refund_status == 'processing' %}
+            <p class="font-weight-bold text-info">Refund Status: Refund is processing and will be completed within 7 working days.</p>
+        {% else %}
+            <p class="font-weight-bold text-warning">The product has been returned, but the refund status is not updated yet.</p>
+        {% endif %}
+    {% elif order.cancel_status == 'Cancelled' %}
+        <p class="font-weight-bold text-info">Your order is cancelled.Product is eligible for refund based on its status.</p>
+    
+    {% else %}
+        <p class="font-weight-bold text-info">Return Status: Your order was delivered.</p>
+    {% endif %}
+
+{% elif order.order.status == 'processing' or order.order.status == 'cancelled' %}
+    {% if order.cancel_status == 'Cancelled' %}
+        {% if order.refund_status == 'Refunded' %}
+            <p class="font-weight-bold text-danger">Your product is cancelled,,Refund Status: This product has been refunded.</p>
+        {% elif order.refund_status == 'processing' and order.order.paid_status %}
+            <p class="font-weight-bold text-info">Your product is cancelled,Refund is processing.</p>
+        {% else %}
+            <p class="font-weight-bold text-warning">The product has been cancelled.</p>
+        {% endif %}
+    {% else %}
+        <p class="font-weight-bold text-info">Your order is being processed.</p>
+    {% endif %}
+
+{% else %}
+    <p class="font-weight-bold text-success">your order is {{order.order.status}}</p>
+
+{% endif %}
+
+                    
+                    </div>
+
+                    <!-- Invoice Section -->
+                    <div class="invoice-section mt-4">
+                        <h5 class="font-weight-bold">Invoice</h5>
+                        <p>Invoice Number: {{ order.invoice_no }}</p>
+                        <p>Order Date: {{ order.order.created_at }}</p>
+                        <p>Total Amount: {{ order.total }}</p>
+                    </div>
+
+                    <!-- Address Section -->
+                    <div class="address-section mt-4">
+                        <h5 style="font-weight: bold;">Shipping Address:</h5>
+                        <p>{{ order.order.first_name}} {{ order.order.last_name }}</p>
+                        <p>{{ order.order.street }}, {{ order.order.city }}, {{ order.order.state }}, {{ order.order.country }}</p>
+                        <p>{{ order.order.postal_code }}</p>
+                        <p>{{ order.order.phone }}</p>
+                    </div>
+
+                    <!-- Order Buttons -->
+                    <div class="order-buttons mt-4">
+                        <a href="{% url 'order' %}" class="btn btn-primary btn-sm" style="font-size: 14px; padding: 5px 10px; border-radius: 25px;">Back to Orders</a>
+                    </div>
+
+                    <!-- Print and Download Buttons (Centering) -->
+                    <div class="receipt-buttons mt-4 text-center">
+                        
+                        <!-- Download Button -->
+                        <a href="{% url 'invoice_download' order.id %}" class="btn btn-success">Download Receipt</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

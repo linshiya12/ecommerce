@@ -1,0 +1,220 @@
+{% extends 'adminbase.html' %}
+{% load static %}
+
+{% block links %}
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+{% endblock %}
+
+{% block css %}
+  <style>
+    body {
+      background-color: #f8f9fa;
+    }
+    .container {
+      background: white;
+      border-radius: 8px;
+      padding: 30px; /* Increased padding */
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+    .form-group {
+      margin-bottom: 30px; /* Increased space between fields */
+    }
+    .form-group label {
+      font-weight: bold;
+    }
+    .current-image {
+      margin-top: 10px;
+    }
+    button {
+      margin-top: 20px; /* Added space before the submit button */
+    }
+    
+    #imagePreviewContainer {
+      width: 100%;
+      max-height: 400px;
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    
+    #imagePreview {
+      max-width: 100%;
+      height: auto;
+    }
+  </style>
+{% endblock %}
+{% block content %}
+  <div class="container-xxl flex-grow-1 container-p-y mt-5" style="background-color:#E6E6FA">
+    <!-- Product List Widget -->
+    <div class="card mb-6">
+      <div class="card-widget-separator-wrapper">
+        <div class="card-body card-widget-separator" style="border: 5px solid #A67BCA;">
+          
+          {% if message %}
+          <div class="alert alert-{{ message_type }} alert-dismissible fade show" role="alert">
+                  {{ message }}
+              <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+              </button>
+          </div>
+          {% endif %}
+
+
+
+          <div class="container mt-5">
+            <form action="" method="POST" enctype="multipart/form-data">
+              {% csrf_token %}
+              <!-- Product Field -->
+              
+
+              <!-- Colour Field -->
+              <div class="form-group">
+                <label for="colour">Colour<span class="text-danger">*</span></label>
+                <input type="text" class="form-control" id="colour" name="colour" value="" required />
+              </div>
+
+              <!-- Variant Status Field -->
+              <div class="form-group">
+                <label for="variant_status">Variant Status</label>
+                <select class="form-control" id="variant_status" name="variant_status">
+                  <option value="draft">Draft</option>
+                  <option value="published" selected>Published</option>
+                  <option value="in_review">In Review</option>
+                  <option value="disabled">Disabled</option>
+                  <option value="rejected">Rejected</option>
+                </select>
+              </div>
+
+             
+              <div class="form-group">
+                <label for="imageInput1">Upload Image 1:</label>
+                <input type="file" class="form-control" id="imageInput1" accept="image/*">
+                <div id="previewContainer1" style="margin-top: 10px; display: none;">
+                    <img id="imagePreview1" style="max-width: 100%; height: auto;">
+                </div>
+                <input type="hidden" name="image_data1" id="imageData1">
+                <button type="button" id="cropButton1" class="btn btn-secondary" style="display: none;">Crop Image 1</button>
+            </div>
+        
+            <!-- Image 2 -->
+            <div class="form-group">
+                <label for="imageInput2">Upload Image 2:</label>
+                <input type="file" class="form-control" id="imageInput2" accept="image/*">
+                <div id="previewContainer2" style="margin-top: 10px; display: none;">
+                    <img id="imagePreview2" style="max-width: 100%; height: auto;">
+                </div>
+                <input type="hidden" name="image_data2" id="imageData2">
+                <button type="button" id="cropButton2" class="btn btn-secondary" style="display: none;">Crop Image 2</button>
+            </div>
+        
+            <!-- Image 3 -->
+            <div class="form-group">
+                <label for="imageInput3">Upload Image 3:</label>
+                <input type="file" class="form-control" id="imageInput3" accept="image/*">
+                <div id="previewContainer3" style="margin-top: 10px; display: none;">
+                    <img id="imagePreview3" style="max-width: 100%; height: auto;">
+                </div>
+                <input type="hidden" name="image_data3" id="imageData3">
+                <button type="button" id="cropButton3" class="btn btn-secondary" style="display: none;">Crop Image 3</button>
+            </div>
+        
+            <!-- Image 4 -->
+            <div class="form-group">
+                <label for="imageInput4">Upload Image 4:</label>
+                <input type="file" class="form-control" id="imageInput4" accept="image/*">
+                <div id="previewContainer4" style="margin-top: 10px; display: none;">
+                    <img id="imagePreview4" style="max-width: 100%; height: auto;">
+                </div>
+                <input type="hidden" name="image_data4" id="imageData4">
+                <button type="button" id="cropButton4" class="btn btn-secondary" style="display: none;">Crop Image 4</button>
+            </div>
+        
+
+              <button type="submit" class="btn btn-primary">Add Variant</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}
+{% block js %}
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+      function setupCropper(imageInputId, previewContainerId, previewId, cropButtonId, imageDataId) {
+          const imageInput = document.getElementById(imageInputId);
+          const previewContainer = document.getElementById(previewContainerId);
+          const imagePreview = document.getElementById(previewId);
+          const cropButton = document.getElementById(cropButtonId);
+          const imageData = document.getElementById(imageDataId);
+          let cropper;
+
+          imageInput.addEventListener("change", function (event) {
+              const file = event.target.files[0];
+              if (file) {
+                  const reader = new FileReader();
+                  reader.onload = function (e) {
+                      imagePreview.src = e.target.result;
+                      previewContainer.style.display = "block";
+                      cropButton.style.display = "inline-block";
+
+                      if (cropper) {
+                          cropper.destroy();
+                      }
+                      cropper = new Cropper(imagePreview, {
+                          aspectRatio: 1,
+                          viewMode: 1,
+                      });
+                  };
+                  reader.readAsDataURL(file);
+              }
+          });
+
+          cropButton.addEventListener("click", function () {
+              if (cropper) {
+                  const canvas = cropper.getCroppedCanvas();
+                  imageData.value = canvas.toDataURL("image/jpeg");
+                  alert(`${imageInputId} cropped successfully!`);
+              }
+          });
+      }
+
+      // Setup Cropper for Each Image Field
+      setupCropper("imageInput1", "previewContainer1", "imagePreview1", "cropButton1", "imageData1");
+      setupCropper("imageInput2", "previewContainer2", "imagePreview2", "cropButton2", "imageData2");
+      setupCropper("imageInput3", "previewContainer3", "imagePreview3", "cropButton3", "imageData3");
+      setupCropper("imageInput4", "previewContainer4", "imagePreview4", "cropButton4", "imageData4");
+  });
+</script>
+
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+  <script>
+    // Bootstrap 4 custom validation
+    ;(function () {
+      'use strict'
+      window.addEventListener(
+        'load',
+        function () {
+          var form = document.getElementById('editProductForm')
+          form.addEventListener(
+            'submit',
+            function (event) {
+              if (form.checkValidity() === false) {
+                event.preventDefault()
+                event.stopPropagation()
+              }
+              form.classList.add('was-validated')
+            },
+            false
+          )
+        },
+        false
+      )
+    })()
+  </script>
+{% endblock %}

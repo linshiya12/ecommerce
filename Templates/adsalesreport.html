@@ -1,0 +1,97 @@
+{% extends "adminbase.html" %}
+{% load static %}
+
+{% block content %}
+
+<div class="card mb-6">
+    <div class="card-widget-separator-wrapper">
+        <div class="card-body card-widget-separator" style="border: 5px solid #A67BCA;">
+
+            <div class="container mt-5">
+                <h1 class="mb-4">Sales Report</h1>
+        
+                <!-- Filter Form -->
+                <form method="GET" action="{% url 'salesreport' %}">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <label for="time_filter">Time Filter</label>
+                            <select id="time_filter" name="time_filter" class="form-control">
+                                <option value="">Select Filter</option>
+                                <option value="daily" {% if time_filter == 'daily' %}selected{% endif %}>Daily</option>
+                                <option value="weekly" {% if time_filter == 'weekly' %}selected{% endif %}>Weekly</option>
+                                <option value="monthly" {% if time_filter == 'monthly' %}selected{% endif %}>Monthly</option>
+                                <option value="yearly" {% if time_filter == 'yearly' %}selected{% endif %}>Yearly</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label for="start_date">Start Date</label>
+                            <input type="date" id="start_date" name="start_date" class="form-control" value="{{ request.GET.start_date }}">
+                        </div>
+                        <div class="col-md-3">
+                            <label for="end_date">End Date</label>
+                            <input type="date" id="end_date" name="end_date" class="form-control" value="{{ request.GET.end_date }}">
+                        </div>
+                        <div class="col-md-3 d-flex align-items-end">
+                            <button type="submit" class="btn btn-primary">Filter</button>
+                            <a href="?start_date={{ request.GET.start_date }}&end_date={{ request.GET.end_date }}&download_pdf=true" class="btn btn-danger ml-3">Download PDF</a>
+                        </div>
+                    </div>
+                </form>
+
+                <hr>
+
+                <!-- Sales Report Summary -->
+                <div class="row">
+                    <div class="col-md-3">
+                        <h5>Total Sales: ₹{{ total_sales|floatformat:0 }}</h5>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-3">
+                        <h5>Total Discounts: ₹{{ total_discount|floatformat:0 }}</h5>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-3">
+                        <h5>Total Orders: {{ total_order_count }}</h5>
+                    </div>
+                </div>
+
+                <!-- Sales Report Table -->
+                <table class="table table-bordered mt-3">
+                    <thead>
+                        <tr>
+                            <th>Order ID</th>
+                            <th>User</th>
+                            <th>Total Price</th>
+                            <th>Discount</th>
+                            <th>Payment Method</th>
+                            <th>Status</th>
+                            <th>Created At</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for order in orders %}
+                            <tr>
+                                <td>{{ order.id }}</td>
+                                <td>{{ order.user }}</td>
+                                <td>₹{{ order.total_price|floatformat:0 }}</td>
+                                <td>₹{{ order.discount|floatformat:0 }}</td>
+                                <td>{{ order.payment_method }}</td>
+                                <td>{{ order.get_status_display }}</td>
+                                <td>{{ order.created_at|date:"Y-m-d H:i" }}</td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="6" class="text-center">No orders found for the selected filters.</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+{% endblock %}

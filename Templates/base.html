@@ -33,6 +33,15 @@
     <link rel="stylesheet" href="{% static 'assets/css/style.css' %}">
     <link rel="stylesheet" href="{% static 'assets/css/skins/skin-demo-5.css' %}">
     <link rel="stylesheet" href="{% static 'assets/css/demos/demo-5.css' %}">
+    <link rel="stylesheet" href="{% static 'assets/css/responsive.css' %}">
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <!--profile icon style -->
+    {% block css %}
+
+    {% endblock css %}
+   
 </head>
 
 <body>
@@ -53,11 +62,9 @@
                         <nav class="main-nav">
                             <ul class="menu sf-arrows">
                                 <li class="megamenu-container active">
-                                    <a href="/home/" class="no-underline" >Home</a>
+                                    <a href="{% url "home" %}" class="no-underline" >Home</a>
                                 </li>
         
-                                   
-
                                 <li>
 
                                     <a href="/shop/" class="sf-with-ul">SHOP</a>
@@ -68,16 +75,16 @@
                                                 <div class="menu-col">
                                                     <div class="menu-title">SHIRTS</div><!-- End .menu-title -->
                                                     <ul>
-                                                        <li><a href="category-list.html">Casual shirts</a></li>
-                                                        <li><a href="category-2cols.html">Formal shirts</a></li>
-                                                        <li><a href="category.html">T-shirts</a></li>
+                                                        <li><a href="{% url "shop" %}">Casual shirts</a></li>
+                                                        <li><a href="{% url "shop" %}">Formal shirts</a></li>
+                                                        <li><a href="{% url "shop" %}">T-shirts</a></li>
                                                     </ul>
                                                 </div><!-- End .menu-col -->
                                             </div><!-- End .col-md-6 -->
 
                                             <div class="col-md-6">
                                                 <div class="banner banner-overlay">
-                                                    <a href="category.html">
+                                                    <a href="#">
                                                         <img src="{% static 'assets/images/menu/banners-1.jpg' %}" alt="Banner">
 
                                                         <div class="banner-content banner-content-bottom">
@@ -90,8 +97,11 @@
                                     </div><!-- End .megamenu megamenu-sm -->
                                 </li>
                                 <li>
-
-                                    <a href="/user-login/" >  Login</a>
+                                {% if not user.is_authenticated %}
+                                <a href="/user-login/" >  Login</a>
+                                
+                                {% endif %}
+                                    
 
                                     
                                 </li>
@@ -108,6 +118,7 @@
                     </div><!-- End .header-left -->
 
                     <div class="header-right">
+                        <!-- Search -->
                         <div class="header-search header-search-extended header-search-visible">
                             <a href="#" class="search-toggle" role="button"><i class="icon-search"></i></a>
                             <form action="#" method="get">
@@ -118,73 +129,124 @@
                                 </div><!-- End .header-search-wrapper -->
                             </form>
                         </div><!-- End .header-search -->
-                        
+                    
+                        <!-- Wishlist -->
                         <a href="/wishlist/" class="wishlist-link">
                             <i class="icon-heart-o"></i>
                         </a>
+                    
 
-                        <div class="dropdown cart-dropdown">
-                            <a href="#" class="dropdown-toggle" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-display="static">
-                                <i class="icon-shopping-cart"></i>
-                                <span class="cart-count">2</span>
+                        <div class="dropdown compare-dropdown">
+                            <a href="#" class="dropdown-toggle" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-display="static" title="Compare Products" aria-label="Compare Products">
+                                <i class="icon-user"></i>
                             </a>
 
                             <div class="dropdown-menu dropdown-menu-right">
+                                <ul class="compare-products">
+                                    {% if user.is_authenticated %}
+                                    <li class="compare-product">
+                                        <i class="icon-user" style="font-size: 1.5em; color: #333; margin-right: 10px;"></i>
+                                        <span style="font-size: 1.5em; color: #333;">Hi, <strong>{{ user.username }}</strong></span>
+                                    </li>
+                            
+                                    <li class="compare-product">
+                                        <a href="{% url "account" %}" class="menu-link">My Account</a>
+                                    </li>
+                            
+                                    <li class="compare-product">
+                                        <a href="/logout/" class="menu-link">Logout</a>
+                                    </li>
+                                    {% else %}
+                                    <li class="compare-product">
+                                        <a href="/user-login/" class="menu-link">Login</a>
+                                    </li>
+                                    {% endif %}
+                                </ul>
+                            </div><!-- End .dropdown-menu -->
+                        </div><!-- End .compare-dropdown -->
+                        <!-- Cart -->
+                        <div class="dropdown cart-dropdown">
+                            <a href="#" class="dropdown-toggle" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-display="static">
+                                <i class="icon-shopping-cart"></i>
+                                <span class="cart-count">{{request.session.total_items}}</span>
+                            </a>
+                            <div class="dropdown-menu dropdown-menu-right">
                                 <div class="dropdown-cart-products">
+                                    {% for item in cart_items %}
+                                    
+                                    
                                     <div class="product">
                                         <div class="product-cart-details">
                                             <h4 class="product-title">
-                                                <a href="/product/">Beige knitted elastic runner shoes</a>
+                                                <a href="/product/">{{item.product}}</a>
                                             </h4>
-
                                             <span class="cart-product-info">
-                                                <span class="cart-product-qty">1</span>
-                                                x $84.00
+                                                <span class="cart-product-qty">{{item.quantity}}</span>
+                                                x ₹{{item.price}}
                                             </span>
-                                        </div><!-- End .product-cart-details -->
-
+                                        </div>
                                         <figure class="product-image-container">
                                             <a href="/product/" class="product-image">
-                                                <img src="{% static 'assets/images/products/cart/product-1.jpg' %}" alt="product">
+                                                <img src="{{item.image.image.url}}" alt="product">
                                             </a>
                                         </figure>
                                         <a href="#" class="btn-remove" title="Remove Product"><i class="icon-close"></i></a>
-                                    </div><!-- End .product -->
+                                    </div>
 
-                                    <div class="product">
+                                    {% endfor %}
+                                    {% comment %} <div class="product">
                                         <div class="product-cart-details">
                                             <h4 class="product-title">
                                                 <a href="/product/">Blue utility pinafore denim dress</a>
                                             </h4>
-
                                             <span class="cart-product-info">
                                                 <span class="cart-product-qty">1</span>
                                                 x $76.00
                                             </span>
-                                        </div><!-- End .product-cart-details -->
-
+                                        </div>
                                         <figure class="product-image-container">
                                             <a href="/product/" class="product-image">
                                                 <img src="{% static 'assets/images/products/cart/product-2.jpg' %}" alt="product">
                                             </a>
                                         </figure>
                                         <a href="#" class="btn-remove" title="Remove Product"><i class="icon-close"></i></a>
-                                    </div><!-- End .product -->
-                                </div><!-- End .cart-product -->
-
-                                <div class="dropdown-cart-total">
+                                    </div> {% endcomment %}
+                                </div>
+                                {% comment %} <div class="dropdown-cart-total">
                                     <span>Total</span>
-
                                     <span class="cart-total-price">$160.00</span>
-                                </div><!-- End .dropdown-cart-total -->
-
+                                </div> {% endcomment %}
                                 <div class="dropdown-cart-action">
                                     <a href="/cart/" class="btn btn-primary">View Cart</a>
                                     <a href="checkout.html" class="btn btn-outline-primary-2"><span>Checkout</span><i class="icon-long-arrow-right"></i></a>
-                                </div><!-- End .dropdown-cart-total -->
-                            </div><!-- End .dropdown-menu -->
+                                </div>
+                            </div>
                         </div><!-- End .cart-dropdown -->
+                    
+                        <!-- Profile Dropdown -->
+                       <!-- Profile Icon and Menu -->
+
+<!-- JavaScript to Toggle Profile Menu -->
+<script>
+    function toggleMenu() {
+        document.getElementById("profileMenu").classList.toggle("active");
+    }
+
+    // Close the menu if clicked outside
+    document.addEventListener("click", function(event) {
+        const profileMenu = document.getElementById("profileMenu");
+        const profileIcon = document.querySelector(".profile-icon");
+
+        if (!profileIcon.contains(event.target) && !profileMenu.contains(event.target)) {
+            profileMenu.style.display = "none";
+        } else {
+            profileMenu.style.display = profileMenu.style.display === "none" ? "block" : "none";
+        }
+    });
+</script>
+
                     </div><!-- End .header-right -->
+                    
                 </div><!-- End .container-fluid -->
             </div><!-- End .header-middle -->
         </header><!-- End .header -->
@@ -225,9 +287,9 @@
                                 <h4 class="widget-title">Information</h4><!-- End .widget-title -->
 
                                 <ul class="widget-list">
-                                    <li><a href="about.html">About Amigo</a></li>
+                                    <li><a href="#">About Amigo</a></li>
                                     <li><a href="/shop/">How to shop on Amigo</a></li>
-                                    <li><a href="faq.html">FAQ</a></li>
+                                    <li><a href="#">FAQ</a></li>
                                     <li><a href="/contact/">Contact us</a></li>
                                     <li><a href="/sign-up/">Log in</a></li>
                                 </ul><!-- End .widget-list -->
@@ -303,18 +365,17 @@
             <nav class="mobile-nav">
                 <ul class="mobile-menu">
                     <li class="active">
-                        <a href="/home/">Home</a>
+                        <a href="{% url "home" %}">Home</a>
 
                         
                     </li>
                     <li>
                         <a href="/shop/">Shop</a>
                         <ul>
-                            <li><a href="category-list.html">Casual shirts</a></li>
-                            <li><a href="category-2cols.html">Formal shirts</a></li>
-                            <li><a href="category.html">T-shirts</a></li>
+                            <li><a href="/shop/">Casual shirts</a></li>
+                            <li><a href="/shop/">Formal shirts</a></li>
+                            <li><a href="/shop/">T-shirts</a></li>
                             <li><a href="/cart/">Cart</a></li>
-                            <li><a href="checkout.html">Checkout</a></li>
                             <li><a href="/wishlist/">Wishlist</a></li>
                         </ul>
                     </li>
@@ -322,10 +383,6 @@
                     <li>
                         <a href="#">Pages</a>
                         <ul>
-                            <li>
-                                <a href="about.html">About</a>
-
-                            </li>
 
                             <li>
                                 <a href="/contact/">Contact</a>
@@ -397,12 +454,54 @@
     <!-- Main JS File -->
     <script src="{% static 'assets/js/main.js' %}"></script>
     <script src="{% static 'assets/js/demos/demo-5.js' %}"></script>
+    <!-- SweetAlert2 CDN -->
+
     <script>
         // Automatically dismiss alerts after 5 seconds
         $(document).ready(function() {
             $(".alert").delay(5000).fadeOut(300);
         });
     </script>
+    {% block js %}
+    
+    <script>
+        $(document).ready(function() {
+        
+            $("#addToCartBtn").on('click', function() {
+                var _vm=$(this);
+                var _qty = $("#productQty").val();
+                var _productId = $(".product-id").val();
+                var _productTitle = $(".productof-title").val();
+                var _productPrice = $(".productof-price").text().trim();
+                var _productImage = $(".pro-image").val();
+    
+               
+               //ajax
+               $.ajax({
+                url:'/add-tocart',
+                data:{
+                    'id':_productId,
+                    'qty':_qty,
+                    'title':_productTitle,
+                    'price':_productPrice,
+                    'image':_productImage
+                },
+                dataType:'json',
+                beforeSend:function(){
+                    _vm.attr('disabled',true);
+                },
+                success:function(res){
+                    $(".cart-count").text(res.totalitems)
+                    _vm.attr('disabled',false);
+                }
+    
+    
+               })
+            });
+        });
+        </script>
+        
+    {% endblock js %}
 </body>
 
 
