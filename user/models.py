@@ -169,7 +169,6 @@ class Product(models.Model):
    
     sku=ShortUUIDField(unique=True,length=10,max_length=30,prefix="sku",alphabet="abcdefgh12345")
     date=models.DateField(null=True,blank=True)
-    updated=models.DateField(null=True,blank=True)
 
     class Meta:
         verbose_name_plural="Products"
@@ -305,7 +304,7 @@ class ShippingAddress(models.Model):
         return f"{self.first_name}-{self.last_name}-{self.street}-{self.city}-{self.state}-{self.country}-{self.postal_code}-{self.phone}"
 
 class Cart_Order(models.Model):
-    user = models.CharField(max_length=100, blank=True, null=True)
+    user = models.IntegerField(blank=True, null=True)
     total_price = models.DecimalField(max_digits=10, decimal_places=2)
     discount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     razorpay_order_id = models.CharField(max_length=100, blank=True, null=True)

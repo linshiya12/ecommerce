@@ -118,4 +118,34 @@
     })();
 </script>
 
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    document.querySelector('form').addEventListener('submit', function(event) {
+        const titleInput = document.getElementById('title');
+        const titleValue = titleInput.value.trim();
+        const titlePattern = /^[A-Za-z]+(?:\s[A-Za-z]+)*$/;
+
+        if (!titlePattern.test(titleValue)) {
+            event.preventDefault(); 
+            event.stopPropagation();
+
+            Swal.fire({
+                icon: 'error',
+                title: 'Invalid Input',
+                text: 'Title should only contain alphabets and cannot be empty or consist of only spaces.',
+                confirmButtonColor: '#3085d6',
+                confirmButtonText: 'OK',
+                width: '300px', 
+                height: '200px',
+                customClass: {
+                    popup: 'small-swal-box' 
+                }
+            }).then(() => {
+                titleInput.focus(); 
+            });
+        }
+    });
+</script>
+
+
 {% endblock js %}

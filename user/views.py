@@ -27,8 +27,8 @@ from datetime import date
 
 # Create your views here.
 def create(request):
-    products=Product.objects.filter(product_status="published", featured="featured")
-    products1=Product.objects.filter(product_status="published").order_by('-date')[:5]
+    products=Product.objects.filter(product_status="published", featured="featured",indproduct__variant_status="published").distinct()
+    products1=Product.objects.filter(product_status="published",indproduct__variant_status="published").distinct().order_by('-date')[:5]
     variant_colour = Variant.objects.filter(variant_status="published")
 
 
@@ -156,16 +156,17 @@ def blog(request):
     return render(request,"blog.html")
 
 def shop(request):
-    products=Product.objects.filter(product_status="published")
+    products=Product.objects.filter(product_status="published",indproduct__variant_status="published").distinct()
     category=Category.objects.filter(category_status="published").exclude(parent=None)
     size=VariantSize.objects.filter(size_status="published").distinct("size")
     variant=Variant.objects.filter(variant_status="published").distinct("colour")
     brand=Brand.objects.filter(brand_status="published")
-
-    sort_by = request.GET.get("sort_by", None)
-    if sort_by:  
+    
+    sort_by = request.GET.get('sort_by', None)
+    if sort_by:
         products = sort_products(sort_by, products)
 
+    
     product_offer=[]
     for p in products:
         
@@ -227,7 +228,7 @@ def shop(request):
         "size":size,
         "variant":variant,
         "brand":brand,
-        'sort_by':sort_by
+        "sort_by":sort_by
     }
     
     
@@ -270,7 +271,7 @@ def sort_products(sort_by, products):
 # individual product
 def product(request,id):
     products=get_object_or_404(Product,id=id)
-    related_product=Product.objects.filter(product_status="published",category=products.category,category__category_status="published").exclude(id=id)
+    related_product=Product.objects.filter(product_status="published",category=products.category,category__category_status="published",indproduct__variant_status="published").distinct().exclude(id=id)
     variant_colour = Variant.objects.filter(product__id=id,variant_status="published")
     first_color = variant_colour.first() if variant_colour.exists() else None
     variant_size = VariantSize.objects.filter(variant=first_color,size_status="published")
@@ -449,9 +450,8 @@ def filter_data(request):
     colour = request.GET.getlist('colour[]')
     size = request.GET.getlist('size[]')
     price = request.GET.getlist('price[]')
-
-    products = Product.objects.filter(product_status="published")
     
+    products = Product.objects.filter(product_status="published",indproduct__variant_status="published").distinct()
     # Price filtering
     q_objects = Q()
     for price_range in price:
@@ -554,7 +554,6 @@ def add_to_cart(request):
     size_variant = VariantSize.objects.filter(size=size_variant_id,variant__id=color_variant_id,variant__product__id=product_id).first()
     image_url=VariantImages.objects.filter(variant__id=color_variant_id,variant__product__id=product_id).first()
 
-    
     if request.user.is_authenticated:
         cart, created = Cart.objects.get_or_create(user=request.user)
     else:
@@ -575,10 +574,11 @@ def add_to_cart(request):
         image=image_url,
         defaults={'quantity': qty, 'price': price}
     )
+    cart_items = cart.items.filter(product__product_status="published",color_variant__variant_status="published",size_variant__size_status="published",size_variant__stock="stock_in").order_by('id') if cart else []
     if not created:
         cart_item.quantity += qty
         cart_item.save()
-    return JsonResponse({'message': 'Item added to cart successfully','totalitems': cart.items.count()})
+    return JsonResponse({'message': 'Item added to cart successfully','totalitems': cart_items.count()})
 
 
 @never_cache
@@ -593,7 +593,7 @@ def cart(request):
         cart, _ = Cart.objects.get_or_create(session_key=session_key, user=None)
 
     # Get items in the cart
-    cart_items = cart.items.filter(product__product_status="published",size_variant__size_status="published",size_variant__stock="stock_in").order_by('id') if cart else []
+    cart_items = cart.items.filter(product__product_status="published",color_variant__variant_status="published",size_variant__size_status="published",size_variant__stock="stock_in").order_by('id') if cart else []
     discounted_price = request.session.get('discounted_price', None)
     if discounted_price is not None:  # Check if the key exists
         request.session.pop('discounted_price')
@@ -612,6 +612,7 @@ def cart(request):
 
     # total items and total amount
     total_items = cart_items.count()
+    
     subtotal_amount = sum(item.total_price() for item in cart_items)
     request.session['total_items']=total_items
     shipping_charge = 0 if subtotal_amount == 0 else 50
@@ -647,7 +648,7 @@ def delete_cart_item(request):
         session_key = request.session.session_key
         cart = Cart.objects.filter(session_key=session_key).first()
 
-    cart_items = cart.items.filter(product__product_status="published",size_variant__size_status="published").order_by('id') if cart else []
+    cart_items = cart.items.filter(product__product_status="published",size_variant__size_status="published",color_variant__variant_status="published",size_variant__stock="stock_in").order_by('id') if cart else []
     total_items = cart_items.count()
     subtotal_amount = sum(item.total_price() for item in cart_items)
     shipping_charge = 0 if subtotal_amount == 0 else 50
@@ -677,7 +678,7 @@ def update_cart_item(request):
         session_key = request.session.session_key
         cart = Cart.objects.filter(session_key=session_key).first()
 
-    cart_items = cart.items.filter(product__product_status="published",size_variant__size_status="published") if cart else []
+    cart_items = cart.items.filter(product__product_status="published",size_variant__size_status="published",color_variant__variant_status="published",size_variant__stock="stock_in") if cart else []
     total_items = cart_items.count()
     subtotal_amount = sum(item.total_price() for item in cart_items)
     shipping_charge = 0 if subtotal_amount == 0 else 50
@@ -718,6 +719,17 @@ def Editprofile(request,id):
             request.session['message'] = "All fields are required."
             request.session['message_type'] = "warning"
             return redirect(f"/editprofile/{id}")
+        
+        if User.objects.filter(username=username).exclude(id=id).exists():
+            request.session['message'] = "This username is already taken."
+            request.session['message_type'] = "warning"
+            return redirect(f"/editprofile/{id}")
+        
+        if User.objects.filter(phoneno=phone).exclude(id=id).exists():
+            request.session['message'] = "This phone number is already registered."
+            request.session['message_type'] = "warning"
+            return redirect(f"/editprofile/{id}")
+
         try:
             user.username=username
             user.phoneno = phone
@@ -851,9 +863,9 @@ def Address(request):
 @login_required(login_url="user-login")
 @never_cache
 def Checkout(request):
-    user=request.user
+    user=request.user.id
     cart=Cart.objects.get(user=user)
-    cart_items = cart.items.filter(product__product_status="published",size_variant__size_status="published",size_variant__stock="stock_in").order_by('id') if cart else []
+    cart_items = cart.items.filter(product__product_status="published",size_variant__size_status="published",color_variant__variant_status="published",size_variant__stock="stock_in").order_by('id') if cart else []
     subtotal_price = sum(item.total_price() for item in cart_items)
     shipping_charge = 0 if subtotal_price == 0 else 50
     total_price=subtotal_price+shipping_charge
@@ -944,7 +956,7 @@ def Checkout(request):
             # request.session.pop('discounted_price',None)
         
         elif payment_method=="wallet":
-            wallet=Wallet.objects.filter(user=request.user).first()
+            wallet=Wallet.objects.filter(user=user).first()
             if not wallet:
                 request.session['message'] = "No wallet found for your account."
                 request.session['message_type'] = "warning"
@@ -1033,7 +1045,7 @@ def Checkout(request):
                             raise ValueError("Selected size variant does not exist or insufficient stock.")
                 if discounted_price is not None:
                     coupon=Coupon.objects.get(code=coupon)
-                    couponusage = CouponUsage.objects.create(coupon=coupon,user=user)
+                    couponusage = CouponUsage.objects.create(coupon=coupon,user=request.user)
                     coupon.used_count+=1
                     coupon.save()
                 # Clear the cart 
@@ -1086,15 +1098,15 @@ def Checkout(request):
                     
         if discounted_price is not None:
             coupon=Coupon.objects.get(code=coupon)
-            couponusage = CouponUsage.objects.create(coupon=coupon,user=user)
+            couponusage = CouponUsage.objects.create(coupon=coupon,user=request.user)
             coupon.used_count+=1
             coupon.save()
         # Clear the cart
-        # cart.items.all().delete()
+        cart.items.all().delete()
         return redirect("order_success")
     
     active_coupons = Coupon.objects.filter(active=True)
-    used_coupons = CouponUsage.objects.filter(user=user).values_list('coupon', flat=True)
+    used_coupons = CouponUsage.objects.filter(user=request.user).values_list('coupon', flat=True)
     available_coupons = active_coupons.exclude(id__in=used_coupons).filter(start_date__lte=date.today(),  end_date__gte=date.today(), used_count__lt=F('usage_limit') )
     
     message = request.session.pop('message', None)
@@ -1193,9 +1205,9 @@ def Order_success(request):
 # order details
 @login_required(login_url="user-login")
 def Order_details(request):
-    user=request.user
+    user=request.user.id
     orders=Cart_Order.objects.filter(user=user).order_by('-id')
-
+    
     # for order in orders:
     #     if order.total_price<=50 and not order.paid_status:
     #         order.status="cancelled"
@@ -1212,32 +1224,17 @@ def Order_details(request):
 # orderview
 @login_required(login_url="user-login")
 def Order_items(request, id):
-    
-    order=Cart_Order.objects.get(id=id)
-    orderitems=OrderItems.objects.filter(order__id=id)
+    user=request.user.id
+
+    order = Cart_Order.objects.get(id=id, user=user)
+  
+    orderitems=OrderItems.objects.filter(order__id=id,order__user=user)
     
     subtotal=0
     for item in orderitems:
         subtotal+=item.price*item.qty
     shipping_charge = 0 if subtotal == 0 else 50
     
-    for item in orderitems:
-        if item.refund_status == 'Refunded' and not item.refund_processed:
-            refund_amount = Decimal(item.price) * item.qty  # Assume the refund amount is based on item price
-            item.refund_amount=refund_amount
-            item.save()
-
-            item_total_price = Decimal(item.total)  # Ensure this is Decimal
-            order.total_price -= item_total_price
-            order.save()
-        
-          
-            # Add the refund to the user's wallet
-            wallet, created = Wallet.objects.get_or_create(user=request.user)
-            wallet.balance = Decimal(wallet.balance) + refund_amount # Add refund amount to the wallet
-            wallet.save()
-            item.refund_processed = True
-            item.save()
     
     #check all items are cancelled
     all_cancelled = True
@@ -1252,6 +1249,7 @@ def Order_items(request, id):
         if item.return_status != 'Returned':  
             all_returned = False
             break    
+    
     if all_cancelled and not order.paid_status:
         order.status = 'cancelled'
         order.total_price=0  
@@ -1414,8 +1412,8 @@ def return_confirmation(request):
     return render(request, 'return_confirmation.html',context)
 
 def Orderitem_view(request, order_id):
-
-    order = get_object_or_404(OrderItems, id=order_id)
+    
+    order = get_object_or_404(OrderItems, id=order_id ,order__user=request.user.id)
         
     context = {
         'order':order
@@ -1631,14 +1629,17 @@ def add_to_wishlist(request):
         image=image_url,
         defaults={'quantity': qty, 'price': price}
     )
+
+    wishlist_items = wishlist.wishlist_items.filter(product__product_status="published",color_variant__variant_status="published",size_variant__size_status="published").order_by('id') if wishlist else []
+
     if not created:
         wishlist_item.quantity += qty
         wishlist_item.save()
-    return JsonResponse({'message': 'Item added to wishlist successfully','totalitems': wishlist.wishlist_items.count()})
+    return JsonResponse({'message': 'Item added to wishlist successfully','totalitems': wishlist_items.count()})
 
 def wishlist(request):
     if request.user.is_authenticated:
-        # if cart.items.size_variant.stock=="stock_in"
+        
         wishlist, _ = Wishlist.objects.get_or_create(user=request.user)
     else:
         if not request.session.session_key:
@@ -1646,7 +1647,7 @@ def wishlist(request):
         session_key = request.session.session_key
         wishlist, _ = Wishlist.objects.get_or_create(session_key=session_key, user=None)
     
-    wishlist_items = wishlist.wishlist_items.filter(product__product_status="published",size_variant__size_status="published").order_by('id') if cart else []
+    wishlist_items = wishlist.wishlist_items.filter(product__product_status="published",color_variant__variant_status="published",size_variant__size_status="published").order_by('id') if wishlist else []
 
     wishlist_items_with_stock_status = []
     for item in wishlist_items:
@@ -1659,7 +1660,7 @@ def wishlist(request):
             # 'color_stock_status': color_stock_status,
         })
 
-    total_item = len(wishlist_items_with_stock_status)
+    total_item = wishlist_items.count()
     request.session['total_item']=total_item
     
     context = {
@@ -1681,13 +1682,13 @@ def delete_wishlist_item(request):
     wishlist_item.delete()
 
     if request.user.is_authenticated:
-        # if cart.items.size_variant.stock=="stock_in"
+        
         wishlist= Wishlist.objects.get(user=request.user)
     else:
         session_key = request.session.session_key
         wishlist= Wishlist.objects.filter(session_key=session_key).first()
     
-    wishlist_items = wishlist.wishlist_items.filter(product__product_status="published",size_variant__size_status="published").order_by('id') if cart else []
+    wishlist_items = wishlist.wishlist_items.filter(product__product_status="published",size_variant__size_status="published",color_variant__variant_status="published").order_by('id') if wishlist else []
 
     wishlist_items_with_stock_status = []
     for item in wishlist_items:
@@ -1700,7 +1701,7 @@ def delete_wishlist_item(request):
             # 'color_stock_status': color_stock_status,
         })
 
-    total_items = len(wishlist_items_with_stock_status)
+    total_items = wishlist_items.count()
     
     context = {
         'wishlist_items_with_stock_status': wishlist_items_with_stock_status,
@@ -1714,7 +1715,7 @@ def delete_wishlist_item(request):
 def apply_coupon(request):
     if request.method == "POST":
         coupon_code = request.POST.get('coupon_code', '').strip()
-        user = request.user
+        user = request.user.id
 
         try:
             # Fetch cart and calculate total price
@@ -1722,7 +1723,7 @@ def apply_coupon(request):
             cart_items = cart.items.filter(
                 product__product_status="published",
                 size_variant__size_status="published",
-                size_variant__stock="stock_in"
+                size_variant__stock="stock_in",color_variant__variant_status="published"
             ).order_by('id')
 
             # if apply_coupon exists,delete that one
@@ -1823,3 +1824,117 @@ def apply_coupon(request):
         "success": False,
         "message": "Invalid request."
     })
+
+
+def removecoupon(request):
+    if request.method=="POST":
+        cart=Cart.objects.get(user=request.user)
+        cart_items = cart.items.filter(product__product_status="published",size_variant__size_status="published",size_variant__stock="stock_in",color_variant__variant_status="published").order_by('id') if cart else []
+        discounted_price = request.session.get('discounted_price', None)
+        if discounted_price is not None:  # Check if the key exists
+            request.session.pop('discounted_price')
+        # Check if original prices are saved in session
+        original_prices = request.session.get('original_prices', None)
+        if original_prices:
+                # Restore the original prices from the session
+            for item in cart_items:
+                if str(item.id) in original_prices:  # Ensure matching ID as a string
+                    item.price = Decimal(original_prices[str(item.id)])  # Convert back to Decimal
+                    item.save()
+
+                # Safely clear the session values after restoring prices
+            if 'original_prices' in request.session:
+                del request.session['original_prices']
+        
+            request.session['message'] = "coupon is removed"
+            request.session['message_type'] = "success"
+            return redirect('checkout')
+    request.session['message'] = "no coupon is applied"
+    request.session['message_type'] = "info"
+    return redirect('checkout')
+
+def search_view(request):
+    query = request.GET.get('q', '')
+    sort_by = request.GET.get('sort_by', None)
+    products = Product.objects.filter(product_status="published", indproduct__variant_status="published").distinct()
+
+    # Apply the search query
+    if query:
+        products = products.filter(
+            Q(title__icontains=query) | Q(description__icontains=query)
+        )
+
+    category=Category.objects.filter(category_status="published").exclude(parent=None)
+    size=VariantSize.objects.filter(size_status="published").distinct("size")
+    variant=Variant.objects.filter(variant_status="published").distinct("colour")
+    brand=Brand.objects.filter(brand_status="published")
+
+    if sort_by:
+        products = sort_products(sort_by, products)
+        
+    product_offer=[]
+    for p in products:
+        
+        # 
+        reviews,avg_rating,double_avg_rating,rating_distribution = get_reviews_by_product(p.id)
+
+        # stock
+        product_is_stock_out = True
+        variants_with_stock = []
+
+        for var in p.indproduct.filter(variant_status="published"):
+            if var.is_stock_out():
+                stock_status = "Stock Out"
+            else:
+                stock_status = "In Stock"
+                product_is_stock_out = False
+
+            variants_with_stock.append({
+                'variant': var,
+                'stock_status': stock_status
+            })
+
+
+        # offer
+        productoffer=ProductOffer.objects.filter(product=p,product__product_status="published",is_active=True,start_date__lte=timezone.now(),end_date__gte=timezone.now()).order_by('-discount_percentage')
+        brandoffer=BrandOffer.objects.filter(brand=p.brand,brand__brand_status="published",is_active=True,start_date__lte=timezone.now(),end_date__gte=timezone.now()).order_by('-discount_percentage')
+    
+        offer=None
+        discounted_price = p.price
+        if productoffer and brandoffer:
+            
+            if productoffer[0].discount_percentage<brandoffer[0].discount_percentage:
+                offer=brandoffer[0]
+                discounted_price = offer.apply_discount(p.price)
+            else:
+                offer=productoffer[0]
+                discounted_price = offer.apply_discount(p.price)
+        elif productoffer:
+            offer=productoffer[0]
+            discounted_price = offer.apply_discount(p.price)
+        elif brandoffer:
+            offer=brandoffer[0]
+            discounted_price = offer.apply_discount(p.price)
+        p.discounted_price=discounted_price
+        p.save()
+        product_offer.append({
+            'product':p,
+            'offer':offer,
+            'discounted_price':discounted_price,
+            'product_is_stock_out': product_is_stock_out,
+            'variants_with_stock': variants_with_stock,
+            'double_avg_rating':double_avg_rating,
+            'reviews' : reviews
+        })
+
+    context={
+        "product_offer":product_offer,
+        "category":category,
+        "size":size,
+        "variant":variant,
+        "brand":brand,
+        "sort_by":sort_by,
+        "query":query
+    }
+    
+    return render(request, 'search.html',context)

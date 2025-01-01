@@ -108,4 +108,33 @@
     })();
 </script>
 
+<script>
+    document.querySelector('form').addEventListener('submit', function(event) {
+        const titleInput = document.getElementById('title');
+        const titleValue = titleInput.value.trim();
+        const titlePattern = /^[A-Za-z]+(?:\s[A-Za-z]+)*$/; // Alphabets only, allows spaces between words
+
+        // Validation for title
+        if (!titlePattern.test(titleValue)) {
+            event.preventDefault(); // Prevent form submission
+            event.stopPropagation(); // Stop further event handling
+
+            // SweetAlert for invalid title
+            Swal.fire({
+                icon: 'error',
+                title: 'Invalid Title',
+                text: 'The title must only contain alphabets and cannot consist of only spaces.',
+                confirmButtonColor: '#3085d6',
+                confirmButtonText: 'OK',
+                width: 300,
+                height: 200,
+            }).then(() => {
+                titleInput.focus(); // Bring focus back to the input
+            });
+        } else {
+            this.classList.add('was-validated'); // Add Bootstrap validation style
+        }
+    });
+</script>
+
 {% endblock js %}

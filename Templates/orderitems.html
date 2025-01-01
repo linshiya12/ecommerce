@@ -42,9 +42,10 @@
                     </ul>
                 </div>
             </aside>
-
+        
             <!-- Main Content -->
             <div class="col-md-8 col-lg-9">
+            {% if order %}
                 {% if message %}
                     <div class="alert alert-{{ message_type }} alert-dismissible fade show m-4" role="alert">
                         {{ message }}
@@ -107,7 +108,7 @@
                                     
 
                                     <td style="padding: 15px 20px; text-align: center;">
-                                        {% if order.status == 'Returned' %}
+                                        {% if item.order.status == 'Returned' %}
                                             <button class="btn btn-secondary btn-sm" style="font-size: 12px; padding: 5px 10px; border-radius: 25px;" disabled>
                                                 Returned
                                             </button>
@@ -116,7 +117,7 @@
                                                 View
                                             </a>
 
-                                        {% elif order.status == 'delivered' %}
+                                        {% elif item.order.status == 'delivered' %}
                                                 {% if item.return_status == 'Not Returned' and item.cancel_status == 'Not Cancelled' %}
                                                 <!-- Return Button for Delivered Orders -->
                                                 <form method="POST" action="{% url 'return_item' item.id %}" style="display:inline;">
@@ -144,7 +145,7 @@
                                                View
                                             </a>
 
-                                        {% elif order.status == 'processing' or order.status == 'cancelled' %}
+                                        {% elif item.order.status == 'processing' or order.status == 'cancelled' %}
                                                 {% if item.cancel_status == 'Cancelled' %}
 
                                                 <!-- Disabled Return Button if Already Returned -->
@@ -186,6 +187,7 @@
 
                     <!-- Total Amount -->
                     <div class="mt-4 text-right">
+                    
                         <p class="text-lg" style="font-size: 16px; color: black; margin-bottom: 0;">
                             Subtotal: <span style="font-size: 16px;">₹{{ subtotal }}</span>
                         </p>
@@ -198,9 +200,16 @@
                         <p class="font-weight-bold text-lg" style="font-size: 18px; color: black; margin-bottom: 0;">
                             Total Amount: <span class="font-weight-bold" style="font-size: 18px;">₹{{ order.total_price }}</span>
                         </p>
-                    </div>
                     
+                    
+                    </div>
+              
                 </div>
+                {% else %}
+                <div class="card" style="border: 1px solid #dee2e6; border-radius: 8px; background-color: #ffffff; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); padding: 30px; text-align: center;">
+                    <h3 class="text-muted" style="margin: 0;">You have no orders yet!</h3>
+                </div>
+                {% endif %}
             </div>
         </div>
     </div>

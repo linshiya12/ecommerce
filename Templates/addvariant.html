@@ -90,7 +90,7 @@
              
               <div class="form-group">
                 <label for="imageInput1">Upload Image 1:</label>
-                <input type="file" class="form-control" id="imageInput1" accept="image/*">
+                <input type="file" class="form-control" id="imageInput1" accept="image/*" required>
                 <div id="previewContainer1" style="margin-top: 10px; display: none;">
                     <img id="imagePreview1" style="max-width: 100%; height: auto;">
                 </div>
@@ -101,7 +101,7 @@
             <!-- Image 2 -->
             <div class="form-group">
                 <label for="imageInput2">Upload Image 2:</label>
-                <input type="file" class="form-control" id="imageInput2" accept="image/*">
+                <input type="file" class="form-control" id="imageInput2" accept="image/*" required>
                 <div id="previewContainer2" style="margin-top: 10px; display: none;">
                     <img id="imagePreview2" style="max-width: 100%; height: auto;">
                 </div>
@@ -112,7 +112,7 @@
             <!-- Image 3 -->
             <div class="form-group">
                 <label for="imageInput3">Upload Image 3:</label>
-                <input type="file" class="form-control" id="imageInput3" accept="image/*">
+                <input type="file" class="form-control" id="imageInput3" accept="image/*" required>
                 <div id="previewContainer3" style="margin-top: 10px; display: none;">
                     <img id="imagePreview3" style="max-width: 100%; height: auto;">
                 </div>
@@ -123,7 +123,7 @@
             <!-- Image 4 -->
             <div class="form-group">
                 <label for="imageInput4">Upload Image 4:</label>
-                <input type="file" class="form-control" id="imageInput4" accept="image/*">
+                <input type="file" class="form-control" id="imageInput4" accept="image/*" required>
                 <div id="previewContainer4" style="margin-top: 10px; display: none;">
                     <img id="imagePreview4" style="max-width: 100%; height: auto;">
                 </div>
@@ -176,7 +176,14 @@
               if (cropper) {
                   const canvas = cropper.getCroppedCanvas();
                   imageData.value = canvas.toDataURL("image/jpeg");
-                  alert(`${imageInputId} cropped successfully!`);
+                  Swal.fire({
+                    icon: 'success',
+                    title: `${imageInputId} Cropped Successfully!`,
+                    text: 'You can now save this image.',
+                    confirmButtonText: 'Ok',
+                    width: 400,
+                    height: 100,
+                });
               }
           });
       }
@@ -217,4 +224,34 @@
       )
     })()
   </script>
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      // Validate the form before submission
+      const form = document.querySelector("form");
+      form.addEventListener("submit", function (event) {
+        let isValid = true;
+    
+        // Check each image field
+        for (let i = 1; i <= 4; i++) {
+          const imageDataField = document.getElementById(`imageData${i}`).value;
+          if (!imageDataField) {
+            isValid = false;
+            Swal.fire({
+              icon: 'error',
+              title: 'Oops...',
+              text: `Image ${i} is required! Please upload an image.`,
+              width: 400,
+              height: 100,
+            });
+            break;  // Exit the loop after showing the alert
+          }
+        }
+    
+        if (!isValid) {
+          event.preventDefault(); // Prevent form submission if validation fails
+        }
+      });
+    });
+</script>
+
 {% endblock %}

@@ -35,8 +35,11 @@ urlpatterns = [
     path('Return_order/<int:id>/', views.Return_Order, name='Return_order'),
     path('Retry/<int:id>/', views.Retry, name='Retry'),
     path('apply-coupon/', views.apply_coupon, name='apply_coupon'),
+    path('remove-coupon/', views.removecoupon, name='removecoupon'),
     path('add-towishlist',views.add_to_wishlist,name="add_to_wishlist"),
     path('delete-towishlist',views.delete_wishlist_item,name="delete-towishlist"),
     path('mywallet/', views.My_wallet, name='mywallet'),
     path('ajax-add-review/<int:id>/', views.ajax_add_review, name='ajax_add_review'),
+    path('search_view',views.search_view,name="search_view"),
+
 ]

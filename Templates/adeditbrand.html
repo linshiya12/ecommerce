@@ -110,4 +110,42 @@
         }, false);
     })();
 </script>
+
+<script>
+    // Validation for "Brand Name" with SweetAlert
+    (function() {
+        'use strict';
+        window.addEventListener('load', function() {
+            const form = document.getElementById('editbrandForm');
+            const brandInput = document.getElementById('brand');
+
+            form.addEventListener('submit', function(event) {
+                const brandValue = brandInput.value.trim();
+                const titlePattern = /^[A-Za-z]+(?:\s[A-Za-z]+)*$/; // Alphabets only, allows spaces between words
+
+                if (!titlePattern.test(brandValue)) {
+                    event.preventDefault(); // Prevent form submission
+                    event.stopPropagation(); // Stop further event handling
+
+                    // SweetAlert for invalid input
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Invalid Brand Name',
+                        text: 'The brand name must only contain alphabets and cannot consist of only spaces.',
+                        width: 400, // Smaller width for alert
+                        padding: '1em',
+                        confirmButtonColor: '#3085d6',
+                        confirmButtonText: 'OK',
+                    }).then(() => {
+                        brandInput.focus(); // Bring focus back to the input field
+                    });
+
+                    return; // Exit validation to avoid adding Bootstrap's "was-validated" class
+                }
+
+                form.classList.add('was-validated'); // Add Bootstrap validation styling
+            });
+        }, false);
+    })();
+</script>
 {% endblock js %}

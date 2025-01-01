@@ -54,6 +54,15 @@ def verify_otp_view(request):
             if current_time > otp_expiry_time:
                 request.session['message'] = "OTP has expired. Please request a new OTP."
                 request.session['message_type'] = "danger"
+                request.session['temp_user'] = {
+                    'username': temp_user_data['username'],
+                    'email': temp_user_data['email'],
+                    'phoneno': temp_user_data['phoneno'],
+                    'password': temp_user_data['password'],
+                    'otp': temp_user_data['otp'],
+                    'otp_created_at': temp_user_data['otp_created_at'],
+                    'referral_code' :temp_user_data['referral_code']
+                }
                 return redirect("verify-otp")
 
             referral_code = generate_referral_code()
@@ -78,25 +87,26 @@ def verify_otp_view(request):
                         referrer_wallet.add_to_wallet(100) 
 
 
-                new_user_wallet, created = Wallet.objects.get_or_create(user=user)
-                new_user_wallet.add_to_wallet(50)
+                    new_user_wallet, created = Wallet.objects.get_or_create(user=user)
+                    new_user_wallet.add_to_wallet(50)
 
                 request.session['message'] = "Your email has been verified. You can now log in."
                 request.session['message_type'] = "success"
                 return redirect("/user-login")
             else:
-                # Store the otp_created_at value in session again for invalid OTP
+                
                 request.session['message'] = "Invalid OTP. Please try again."
                 request.session['message_type'] = "danger"
                 
-                # Preserve the temp user data including otp_created_at
+               
                 request.session['temp_user'] = {
                     'username': temp_user_data['username'],
                     'email': temp_user_data['email'],
                     'phoneno': temp_user_data['phoneno'],
                     'password': temp_user_data['password'],
                     'otp': temp_user_data['otp'],
-                    'otp_created_at': temp_user_data['otp_created_at'],  # Make sure to preserve this
+                    'otp_created_at': temp_user_data['otp_created_at'], 
+                    'referral_code' :temp_user_data['referral_code']
                 }
 
                 return redirect("verify-otp")
@@ -150,6 +160,21 @@ def register_view(request):
             request.session['message_type'] = "warning"
             return redirect("/sign-up")
 
+        if User.objects.filter(username=username).exists():
+            request.session['message'] = "This username is already taken."
+            request.session['message_type'] = "warning"
+            return redirect("/sign-up")
+
+        if User.objects.filter(email=email).exists():
+            request.session['message'] = "This email is already registered."
+            request.session['message_type'] = "warning"
+            return redirect("/sign-up")
+
+        if User.objects.filter(phoneno=phoneno).exists():
+            request.session['message'] = "This phone number is already registered."
+            request.session['message_type'] = "warning"
+            return redirect("/sign-up")
+        
         # Checking matching password
         if password != confirmpassword:
             request.session['message'] = "Passwords do not match."
@@ -223,7 +248,7 @@ def register_view(request):
 def resend_otp_view(request):
     temp_user = request.session.get('temp_user')
     email =(temp_user.get('email'))
-
+   
     if request.method == "GET":
         # Generate a new OTP
         new_otp = random.randint(100000, 999999)  # Example OTP range

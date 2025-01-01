@@ -28,7 +28,17 @@
                         {% csrf_token %}
                         <input type="text" class="form-control" required name="coupon_code" id="coupon-input" placeholder="Enter coupon code">
                         <label for="coupon-input" class="text-truncate"></label>
-                        <button type="submit" class="btn btn-primary">Apply Coupon</button>
+                        <div style="display: flex; gap: 10px;">
+                            <button type="submit" class="btn btn-primary">Apply Coupon</button>
+                            
+                        </div>
+                    </form>
+
+                    <form action="{% url 'removecoupon' %}" method="POST" style="margin-top: 10px;">
+                        {% csrf_token %}
+                        <div style="display: flex; gap: 10px;">
+                            <button type="submit" class="btn btn-primary">Remove Coupon</button>
+                        </div>
                     </form>
                     
                 </div>

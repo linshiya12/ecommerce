@@ -60,6 +60,9 @@
                          style="background-color: #C33C3C; color: #fff; font-weight: bold; text-align: center; padding: 1rem;">
                         My Wallet
                     </div>
+                {% if wallet %}
+                
+               
                     <div class="card-body text-center">
                         {% for wallet in wallet %}
                         <h4 class="font-weight-bold mb-3">Current Wallet Balance</h4>
@@ -67,6 +70,12 @@
                         {% endfor %}
                         
                     </div>
+                {% else %}
+                    <div class="card-body text-center">
+                        <h4 class="font-weight-bold mb-3">Current Wallet Balance</h4>
+                        <p class="display-4" style="color: #28a745;">₹0</p>
+                    </div>
+                {% endif %}
                 </div>
             </section>
             

@@ -45,6 +45,7 @@
 
             <!-- Main Content -->
             <div class="col-md-8 col-lg-9">
+            
                 <div class="card" style="border: 1px solid #dee2e6; border-radius: 8px; background-color: #ffffff; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); padding: 30px;">
                     <h3 class="card-title text-center" style="color: #007bff; font-weight: bold; margin-bottom: 20px;">Product Details</h3>
 
@@ -75,40 +76,40 @@
 
                     <!-- Conditional Messages for Refund / Return -->
                     <div class="product-status mt-4">
-{% if order.order.status == 'delivered' or order.order.status == 'Returned' %}
-    {% if order.return_status == 'Returned' %}
-        {% if order.refund_status == 'Refunded' %}
-            <p class="font-weight-bold text-danger">Refund Status: This product has been refunded.</p>
-            <a href="{% url 'mywallet' %}" class="btn btn-success">Check Wallet</a>
-        {% elif order.refund_status == 'processing' %}
-            <p class="font-weight-bold text-info">Refund Status: Refund is processing and will be completed within 7 working days.</p>
-        {% else %}
-            <p class="font-weight-bold text-warning">The product has been returned, but the refund status is not updated yet.</p>
-        {% endif %}
-    {% elif order.cancel_status == 'Cancelled' %}
-        <p class="font-weight-bold text-info">Your order is cancelled.Product is eligible for refund based on its status.</p>
-    
-    {% else %}
-        <p class="font-weight-bold text-info">Return Status: Your order was delivered.</p>
-    {% endif %}
+                    {% if order.order.status == 'delivered' or order.order.status == 'Returned' %}
+                        {% if order.return_status == 'Returned' %}
+                            {% if order.refund_status == 'Refunded' %}
+                                <p class="font-weight-bold text-danger">Refund Status: This product has been refunded.</p>
+                                <a href="{% url 'mywallet' %}" class="btn btn-success">Check Wallet</a>
+                            {% elif order.refund_status == 'processing' %}
+                                <p class="font-weight-bold text-info">Refund Status: Refund is processing and will be completed within 7 working days.</p>
+                            {% else %}
+                                <p class="font-weight-bold text-warning">The product has been returned, but the refund status is not updated yet.</p>
+                            {% endif %}
+                        {% elif order.cancel_status == 'Cancelled' %}
+                            <p class="font-weight-bold text-info">Your order is cancelled.Product is eligible for refund based on its status.</p>
+                        
+                        {% else %}
+                            <p class="font-weight-bold text-info">Return Status: Your order was delivered.</p>
+                        {% endif %}
 
-{% elif order.order.status == 'processing' or order.order.status == 'cancelled' %}
-    {% if order.cancel_status == 'Cancelled' %}
-        {% if order.refund_status == 'Refunded' %}
-            <p class="font-weight-bold text-danger">Your product is cancelled,,Refund Status: This product has been refunded.</p>
-        {% elif order.refund_status == 'processing' and order.order.paid_status %}
-            <p class="font-weight-bold text-info">Your product is cancelled,Refund is processing.</p>
-        {% else %}
-            <p class="font-weight-bold text-warning">The product has been cancelled.</p>
-        {% endif %}
-    {% else %}
-        <p class="font-weight-bold text-info">Your order is being processed.</p>
-    {% endif %}
+                    {% elif order.order.status == 'processing' or order.order.status == 'cancelled' %}
+                        {% if order.cancel_status == 'Cancelled' %}
+                            {% if order.refund_status == 'Refunded' %}
+                                <p class="font-weight-bold text-danger">Your product is cancelled,,Refund Status: This product has been refunded.</p>
+                            {% elif order.refund_status == 'processing' and order.order.paid_status %}
+                                <p class="font-weight-bold text-info">Your product is cancelled,Refund is processing.</p>
+                            {% else %}
+                                <p class="font-weight-bold text-warning">The product has been cancelled.</p>
+                            {% endif %}
+                        {% else %}
+                            <p class="font-weight-bold text-info">Your order is being processed.</p>
+                        {% endif %}
 
-{% else %}
-    <p class="font-weight-bold text-success">your order is {{order.order.status}}</p>
+                    {% else %}
+                        <p class="font-weight-bold text-success">your order is {{order.order.status}}</p>
 
-{% endif %}
+                    {% endif %}
 
                     
                     </div>
@@ -142,6 +143,7 @@
                         <a href="{% url 'invoice_download' order.id %}" class="btn btn-success">Download Receipt</a>
                     </div>
                 </div>
+            
             </div>
         </div>
     </div>

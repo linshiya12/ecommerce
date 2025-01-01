@@ -90,6 +90,11 @@ def productedit(request,id):
             request.session['message_type']="warning"
             return redirect(f"/adproductedit/{id}")
 
+        if Product.objects.filter(title__iexact=title).exclude(id=id).exists():
+            request.session['message']="this product already exists."
+            request.session['message_type']="warning"
+            return redirect(f"/adproductedit/{id}")
+        
         #Retrieve ForeignKey instances
         try:
             category = Category.objects.get(id=category_id)
@@ -111,7 +116,6 @@ def productedit(request,id):
             product.product_status = product_status
             product.featured = featured
             product.date = date
-            product.updated = updated
             product.save()
 
             request.session['message']="Product updated successfully."
@@ -122,8 +126,8 @@ def productedit(request,id):
             request.session['message_type']="warning"
             return redirect(f"/adproductedit/{id}")
     product = Product.objects.get(id=id)
-    category = Category.objects.all()
-    brand = Brand.objects.all()
+    category = Category.objects.filter(category_status="published")
+    brand = Brand.objects.filter(brand_status="published")
     user = User.objects.all()
 
 
@@ -145,8 +149,8 @@ def productedit(request,id):
 @never_cache
 @user_passes_test(lambda u: u.is_superuser,login_url='error')
 def productadd(request):
-    category = Category.objects.all()
-    brand = Brand.objects.all()
+    category = Category.objects.filter(category_status="published")
+    brand = Brand.objects.filter(brand_status="published")
     user = User.objects.all()
 
     if request.method == "POST":
@@ -159,15 +163,20 @@ def productadd(request):
         product_status = request.POST.get("product_status")
         featured = request.POST.get("featured") # Converts to boolean
         date = request.POST.get("date")
-        updated = request.POST.get("updated")
+        
 
         #Check required fields
-        required_fields = [category_id, brand_id, title, description, price,featured, specification, product_status, date, updated]
+        required_fields = [category_id, brand_id, title, description, price,featured, specification, product_status, date]
         if any(field == "" for field in required_fields):
             request.session['message']= "All fields are required."
             request.session['message_type']="warning"
             return redirect("/adproductadd")
 
+        if Product.objects.filter(title__iexact=title).exists():
+            request.session['message']="this product already exists."
+            request.session['message_type']="warning"
+            return redirect("/adproductadd")
+        
         #Retrieve ForeignKey instances
         try:
             category = Category.objects.get(id=category_id)
@@ -180,7 +189,7 @@ def productadd(request):
         #Save the product
 
         try:
-            product=Product.objects.create(category=category,brand=brand,title=title,description=description,price=float(price),specification=specification,product_status=product_status,featured=featured,date=date,updated=updated)
+            product=Product.objects.create(category=category,brand=brand,title=title,description=description,price=float(price),specification=specification,product_status=product_status,featured=featured,date=date)
             request.session['message']= "Product added successfully."
             request.session['message_type']="success"
             return redirect("/adminproductlist")
@@ -246,7 +255,7 @@ def addvariantsize(request,id):
         #Save the variant size
         try:
             variantsize=VariantSize.objects.create(variant=variant,size=size,quantity=int(quantity),stock=stock)
-            request.session['message']= "Product added successfully."
+            request.session['message']= "size added successfully."
             request.session['message_type']="success"
             return redirect(f"/adshowvariant/{id}")
 
@@ -290,7 +299,7 @@ def variantsizedit(request, id):
             request.session['message_type']="warning"
             return redirect(f"/variantsizedit/{id}")
 
-        if VariantSize.objects.filter(size=size,variant__id=id,size_status=size_status,stock=stock,quantity=quantity).exists():
+        if VariantSize.objects.filter(size=size,variant__id=id).exclude(id=id).exists():
             request.session['message']="this size already exists."
             request.session['message_type']="warning"
             return redirect(f"/variantsizedit/{id}")
@@ -352,7 +361,7 @@ def Variantcolouredit(request,id):
             request.session['message_type']="warning"
             return redirect(f"/variantcolouredit/{id}")
 
-        if Variant.objects.filter(colour=newcolour).exclude(id=id).exists():
+        if Variant.objects.filter(colour__iexact=newcolour,product=colour.product).exclude(id=id).exists():
             request.session['message']="this colour already exists."
             request.session['message_type']="warning"
             return redirect(f"/variantcolouredit/{id}")
@@ -423,16 +432,15 @@ def addvariant(request, id):
             request.session['message_type']="warning"
             return redirect(f"/addvariant/{id}")
 
-        if Variant.objects.filter(colour=colour,product__id=id).exists():
+        if Variant.objects.filter(colour__iexact=colour,product__id=id).exists():
             request.session['message']= "A variant with this colour already exists."
             request.session['message_type']="warning"
             return redirect(f"/addvariant/{id}")
-
-        #Save product
-
+    
+        #Save variant
         try:
             variant=Variant.objects.create(product=product,colour=colour,variant_status=variant_status)
-            request.session['message']="Product added successfully."
+            request.session['message']="variant added successfully."
             request.session['message_type']="success"
             for i in range(1, 5):
                 image_data = request.POST.get(f"image_data{i}")
@@ -460,6 +468,7 @@ def addvariant(request, id):
 
 
 @never_cache
+@user_passes_test(lambda u: u.is_superuser,login_url='error')
 def imageedit(request, id, var_id):
     variantimage = VariantImages.objects.get(id=id)
     if request.method == "POST":
@@ -470,14 +479,22 @@ def imageedit(request, id, var_id):
         except Variant.DoesNotExist as e:
             request.session['message']= f"Invalid selection for {str(e).split()[0]}."
             request.session['message_type']="warning"
-            return redirect(f"/adeditimage/{id}")
+            return redirect(f"/imageedit/{id}/{var_id}")
 
+        required_fields = [image_data]
+        if any(field == "" for field in required_fields):
+            request.session['message']= "Please select a valid image file."
+            request.session['message_type']="warning"
+            return redirect(f"/imageedit/{id}/{var_id}")
+        
         # If image data is provided
         if image_data:
             try:
                 #base64
                 format, imgstr = image_data.split(';base64,')
                 ext = format.split('/')[-1]
+
+                
                 image_data = ContentFile(base64.b64decode(imgstr), name=f"variant_image.{ext}")
                 
                 #Save
@@ -492,8 +509,8 @@ def imageedit(request, id, var_id):
             except Exception as e:
                 request.session['message']= f"An unexpected error occurred: {str(e)}"
                 request.session['message_type']="warning"
-                return redirect(f"/adeditimage/{id}")
-
+                return redirect(f"/imageedit/{id}/{var_id}")
+   
     message = request.session.pop('message', None)
     message_type = request.session.pop('message_type', None)
 
@@ -540,7 +557,11 @@ def categoryedit(request, id):
             request.session['message']= "All fields are required."
             request.session['message_type']="warning"
             return redirect(f"/categoryedit/{id}")
-
+        
+        if Category.objects.filter(title__iexact=title).exclude(id=id).exists():
+            request.session['message']= "A category with this title already exists."
+            request.session['message_type']="warning"
+            return redirect(f"/categoryedit/{id}")
         try:
             if parent_id and parent_id != "None":
                 try:
@@ -591,6 +612,11 @@ def categoryadd(request):
             request.session['message_type']="warning"
             return redirect(reverse("categoryadd"))
 
+        if Category.objects.filter(title__iexact=title).exists():
+            request.session['message']= "A category with this title already exists."
+            request.session['message_type']="warning"
+            return redirect(reverse("categoryadd"))
+
         try:
             parent = None
             if parent_id:
@@ -617,7 +643,7 @@ def categoryadd(request):
             request.session['message_type']="warning"
             return redirect(reverse("categoryadd"))
 
-    all_categories = Category.objects.all()  
+    all_categories = Category.objects.filter(category_status="published")  
     message = request.session.pop('message', None)
     message_type = request.session.pop('message_type', None)
 
@@ -655,7 +681,7 @@ def brandedit(request,id):
             request.session['message_type']="warning"
             return redirect(f"/brandedit/{id}")
 
-        if Brand.objects.filter(title=title,brand_status=brand_status).exists():
+        if Brand.objects.filter(title__iexact=title).exclude(id=id).exists():
             request.session['message']= "this brand already exists."
             request.session['message_type']="warning"
             return redirect(f"/brandedit/{id}")
@@ -695,7 +721,7 @@ def brandadd(request):
             request.session['message_type']="warning"
             return redirect("/brandadd")
 
-        if Brand.objects.filter(title=brand,brand_status=brand_status).exists():
+        if Brand.objects.filter(title__iexact=brand).exists():
             request.session['message']= "this brand already exists."
             request.session['message_type']="warning"
             return redirect("/brandadd")
@@ -825,13 +851,29 @@ def update_refund_status(request):
     if request.method == 'POST':
         item_id = request.POST.get('item_id')
         new_status = request.POST.get('status')
-       
+  
         try:
-            order = OrderItems.objects.get(id=item_id)
-            order.refund_status = new_status
-            order.save()
+            orderitem = OrderItems.objects.get(id=item_id)
+            orderitem.refund_status = new_status
 
-            return JsonResponse({'message': 'refund status updated successfully!'})
+            if new_status == "Refunded":
+                refund_amount = Decimal(orderitem.price) * orderitem.qty  # Ensure price and qty are decimals
+                orderitem.refund_amount = refund_amount
+
+                item_total_price = Decimal(orderitem.total)
+                orderitem.order.total_price -= item_total_price
+                orderitem.order.save()
+
+                wallet, created = Wallet.objects.get_or_create(user=orderitem.order.user)
+                wallet.balance = Decimal(wallet.balance or 0) + refund_amount
+                wallet.save()
+                
+
+                orderitem.refund_processed = True
+
+            orderitem.save()
+
+            return JsonResponse({'message': 'Refund status updated successfully!'})
 
         except OrderItems.DoesNotExist:
             return JsonResponse({'message': 'Ordered item not found!'}, status=404)
@@ -903,7 +945,7 @@ def edit_productoffer(request,id):
             offer.discount_percentage=discount_percentage
             offer.start_date=start_date
             offer.end_date=end_date
-            offer.is_active="True"
+            offer.is_active=is_active
             offer.save()
 
             request.session['message'] = "Offer updated successfully."

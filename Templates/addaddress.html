@@ -81,12 +81,14 @@
     document.getElementById('checkoutForm').addEventListener('submit', function(event) {
         let valid = true;
 
-        // Function to check if the input value contains only spaces
-        function isNotEmpty(value) {
-            return value.trim() !== ''; // Check if value is not just spaces
+        function isValidName(value) {
+            return /^[a-zA-Z\s]*$/.test(value) && /[a-zA-Z]/.test(value) && value.trim() !== '';
         }
 
-        // SweetAlert function to show validation messages
+        function hasNonZeroDigit(value) {
+            return /[1-9]/.test(value);
+        }
+
         function showAlert(title, message) {
             Swal.fire({
                 icon: 'error',
@@ -97,64 +99,69 @@
 
         // First Name Validation
         const firstName = document.getElementById('first_name').value;
-        if (!isNotEmpty(firstName)) {
+        if (!isValidName(firstName)) {
             valid = false;
-            showAlert('Validation Error', 'First Name is required and cannot be empty or only spaces.');
+            showAlert('Validation Error', 'First Name must have at least one letter and cannot be empty or only spaces.');
         }
 
         // Last Name Validation
         const lastName = document.getElementById('last_name').value;
-        if (!isNotEmpty(lastName)) {
+        if (!isValidName(lastName)) {
             valid = false;
-            showAlert('Validation Error', 'Last Name is required and cannot be empty or only spaces.');
+            showAlert('Validation Error', 'Last Name must have at least one letter and cannot be empty or only spaces.');
         }
 
         // Country Validation
         const country = document.getElementById('country').value;
-        if (!isNotEmpty(country)) {
+        if (country.trim() === '') {
             valid = false;
             showAlert('Validation Error', 'Country is required and cannot be empty or only spaces.');
         }
 
         // Street Address Validation
         const street = document.getElementById('street').value;
-        if (!isNotEmpty(street)) {
+        if (street.trim() === '') {
             valid = false;
             showAlert('Validation Error', 'Street Address is required and cannot be empty or only spaces.');
         }
 
         // City Validation
         const city = document.getElementById('city').value;
-        if (!isNotEmpty(city)) {
+        if (city.trim() === '') {
             valid = false;
             showAlert('Validation Error', 'City is required and cannot be empty or only spaces.');
         }
 
         // State Validation
         const state = document.getElementById('state').value;
-        if (!isNotEmpty(state)) {
+        if (state.trim() === '') {
             valid = false;
             showAlert('Validation Error', 'State is required and cannot be empty or only spaces.');
         }
 
-        // Postal Code Validation (between 6 and 10 characters)
+        // Postal Code Validation (between 6 and 10 characters and must contain at least one nonzero digit)
         const postalCode = document.getElementById('postal_code').value;
-        if (!isNotEmpty(postalCode) || postalCode.length < 6 || postalCode.length > 10) {
+        if (
+            postalCode.trim() === '' ||
+            postalCode.length < 6 ||
+            postalCode.length > 10 ||
+            !hasNonZeroDigit(postalCode)
+        ) {
             valid = false;
-            showAlert('Validation Error', 'Postal Code must be between 6 and 10 characters.');
+            showAlert('Validation Error', 'Postal Code must be between 6 and 10 characters and contain at least one nonzero digit.');
         }
 
-        // Phone Validation (at least 10 digits)
+        // Phone Validation (at least 10 digits and must contain at least one nonzero digit)
         const phone = document.getElementById('phone').value;
-        if (!isNotEmpty(phone) || phone.length < 10 || isNaN(phone)) {
+        if (phone.trim() === '' || phone.length < 10 || isNaN(phone) || !hasNonZeroDigit(phone)) {
             valid = false;
-            showAlert('Validation Error', 'Phone number must be at least 10 digits.');
+            showAlert('Validation Error', 'Phone number must be at least 10 digits and contain at least one nonzero digit.');
         }
 
         // Email Validation
         const email = document.getElementById('email').value;
         const emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
-        if (!isNotEmpty(email) || !email.match(emailPattern)) {
+        if (email.trim() === '' || !email.match(emailPattern)) {
             valid = false;
             showAlert('Validation Error', 'Please enter a valid email address and ensure it is not empty or only spaces.');
         }

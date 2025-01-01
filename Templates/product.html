@@ -127,7 +127,9 @@
                                     data-zoom-image="{{ i.image.url }}">
                                     <img src="{{ i.image.url }}" alt="product side">
                                     </a>
+
                                 {% endfor %}
+                           
                                     
                                 </div><!-- End .product-image-gallery -->
                             </div><!-- End .row -->
@@ -141,7 +143,7 @@
                     
                             <div class="ratings-container">
                                 <div class="ratings">
-                                    <div class="ratings-val" style="width: 80%;"></div>
+                                    <div class="ratings-val" style="width: {{double_avg_rating}}%;"></div>
                                 </div>
                                 <a class="ratings-text" href="#product-review-link" id="review-link">({{reviews.count}} Reviews)</a>
                             </div>
@@ -507,15 +509,7 @@
                         </a>
                         {% endif %}
                         {% endwith %}
-                        <div class="product-action-vertical">
-                            <a href="#" class="btn-product-icon btn-wishlist btn-expandable"><span>add to wishlist</span></a>
-                            <a href="popup/quickView.html" class="btn-product-icon btn-quickview" title="Quick view"><span>Quick view</span></a>
-                            <a href="#" class="btn-product-icon btn-compare" title="Compare"><span>Compare</span></a>
-                        </div><!-- End .product-action-vertical -->
-
-                        <div class="product-action">
-                            <a href="#" class="btn-product btn-cart"><span>add to cart</span></a>
-                        </div><!-- End .product-action -->
+                        
                     </figure><!-- End .product-media -->
 
                     <div class="product-body">
@@ -531,12 +525,12 @@
                             <span class="new-price"> {{ p.product.price }}</span>
                             {% endif %}
                         </div><!-- End .product-price -->
-                        <div class="ratings-container">
+                        {% comment %} <div class="ratings-container">
                             <div class="ratings">
                                 <div class="ratings-val" style="width: 20%;"></div><!-- End .ratings-val -->
                             </div><!-- End .ratings -->
                             <span class="ratings-text">( 2 Reviews )</span>
-                        </div><!-- End .rating-container -->
+                        </div><!-- End .rating-container --> {% endcomment %}
 
                         <div class="product-nav product-nav-dots">
                             {% for colour in p.product.indproduct.all %}
@@ -563,7 +557,7 @@
 <!--addtocart-->
 <script>
     $(document).ready(function() {
-    
+        
         $("#addToCartBtn").on('click', function() {
             var _vm=$(this);
             var _qty = $("#productQty").val();
@@ -612,6 +606,11 @@
             success:function(res){
                 $(".cart-count").text(res.totalitems)
                 _vm.attr('disabled',false);
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Added to Cart',
+                    text: 'Your product has been successfully added to the cart.',
+                });
             }
 
 
@@ -680,6 +679,11 @@
                 success:function(res){
                     $(".wish-count").text(res.totalitems)
                     _vm.attr('disabled',false);
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Added to wishlist',
+                        text: 'Your product has been successfully added to the wishlist.',
+                    });
                 }
     
     

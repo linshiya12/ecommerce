@@ -86,14 +86,24 @@
             return value.trim() !== ''; // Check if value is not just spaces
         }
 
+        // Function to check if the value contains only letters (for first and last names)
+        function isAlpha(value) {
+            return /^[A-Za-z]+$/.test(value); // Allow only letters
+        }
+
+        // Function to check if the value contains at least one non-zero digit
+        function hasNonZeroDigit(value) {
+            return /\d/.test(value) && !/^0*$/.test(value); // Contains at least one non-zero digit
+        }
+
         // First Name Validation
         const firstName = document.getElementById('first_name').value;
-        if (!isNotEmpty(firstName)) {
+        if (!isNotEmpty(firstName) || !isAlpha(firstName)) {
             valid = false;
             Swal.fire({
                 icon: 'error',
                 title: 'Invalid Input',
-                text: 'First Name is required and cannot be empty or only spaces.',
+                text: 'First Name is required, cannot be empty or only spaces, and must contain only letters.',
                 confirmButtonText: 'OK',
                 confirmButtonColor: '#3085d6'
             });
@@ -101,12 +111,12 @@
 
         // Last Name Validation
         const lastName = document.getElementById('last_name').value;
-        if (!isNotEmpty(lastName)) {
+        if (!isNotEmpty(lastName) || !isAlpha(lastName)) {
             valid = false;
             Swal.fire({
                 icon: 'error',
                 title: 'Invalid Input',
-                text: 'Last Name is required and cannot be empty or only spaces.',
+                text: 'Last Name is required, cannot be empty or only spaces, and must contain only letters.',
                 confirmButtonText: 'OK',
                 confirmButtonColor: '#3085d6'
             });
@@ -164,27 +174,27 @@
             });
         }
 
-        // Postal Code Validation (between 6 and 10 characters)
+        // Postal Code Validation (between 6 and 10 characters, and must contain at least one non-zero digit)
         const postalCode = document.getElementById('postal_code').value;
-        if (!isNotEmpty(postalCode) || postalCode.length < 6 || postalCode.length > 10) {
+        if (!isNotEmpty(postalCode) || postalCode.length < 6 || postalCode.length > 10 || !hasNonZeroDigit(postalCode)) {
             valid = false;
             Swal.fire({
                 icon: 'error',
                 title: 'Invalid Input',
-                text: 'Postal Code must be between 6 and 10 characters.',
+                text: 'Postal Code must be between 6 and 10 characters and contain at least one non-zero digit.',
                 confirmButtonText: 'OK',
                 confirmButtonColor: '#3085d6'
             });
         }
 
-        // Phone Validation (at least 10 digits)
+        // Phone Validation (at least 10 digits and contains at least one non-zero digit)
         const phone = document.getElementById('phone').value;
-        if (!isNotEmpty(phone) || phone.length < 10 || isNaN(phone)) {
+        if (!isNotEmpty(phone) || phone.length < 10 || isNaN(phone) || !hasNonZeroDigit(phone)) {
             valid = false;
             Swal.fire({
                 icon: 'error',
                 title: 'Invalid Input',
-                text: 'Phone number must be at least 10 digits.',
+                text: 'Phone number must be at least 10 digits and contain at least one non-zero digit.',
                 confirmButtonText: 'OK',
                 confirmButtonColor: '#3085d6'
             });
@@ -210,6 +220,7 @@
         }
     });
 </script>
+
 
 
 {% endblock js %}

@@ -59,25 +59,27 @@
             return value.trim() !== ''; // Check if value is not just spaces
         }
 
-        // Username Validation: Check if it contains spaces
+        // Username Validation: Only letters, cannot contain spaces
         const username = document.getElementById('username').value;
-        if (!isNotEmpty(username) || username.includes(' ')) {
+        const usernamePattern = /^[A-Za-z]+$/; // Only letters allowed
+        if (!isNotEmpty(username) || username.includes(' ') || !username.match(usernamePattern)) {
             valid = false;
             Swal.fire({
                 icon: 'error',
                 title: 'Invalid Username',
-                text: 'Username cannot contain spaces and cannot be empty.',
+                text: 'Username must contain only letters and cannot contain spaces.',
             });
         }
 
-        // Phone Validation: Must be between 10 and 15 digits
+        // Phone Validation: Must be between 10 and 15 digits and cannot be all zeros
         const phone = document.getElementById('phone').value;
-        if (!isNotEmpty(phone) || phone.length < 10 || phone.length > 15 || isNaN(phone)) {
+        const phonePattern = /^[0-9]{10,15}$/;
+        if (!isNotEmpty(phone) || !phone.match(phonePattern) || parseInt(phone) === 0) {
             valid = false;
             Swal.fire({
                 icon: 'error',
                 title: 'Invalid Phone Number',
-                text: 'Phone number must be between 10 and 15 digits.',
+                text: 'Phone number must be between 10 and 15 digits and cannot be all zeros.',
             });
         }
 
